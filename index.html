@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>TheKeeks' NZ Adventure</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script async src="//www.instagram.com/embed.js"></script>
+</head>
+<body>
+
+<div class="page-container">
+  <div class="title-bar">TheKeeks' NZ Adventure - Microsoft Internet Explorer</div>
+  <div class="page-inner">
+
+    <!-- Header -->
+    <div class="site-header">
+      <h1>TheKeeks' NZ Adventure</h1>
+      <p id="last-updated" class="last-updated">Last updated: --</p>
+    </div>
+
+    <!-- Marquee -->
+    <div class="marquee-container">
+      <marquee behavior="scroll" direction="left" scrollamount="3">
+        <span id="marquee-text">*** Welcome to my New Zealand travel diary! *** Kia ora! ***</span>
+      </marquee>
+    </div>
+
+    <!-- Main Layout Table -->
+    <table class="layout-table">
+      <tr>
+        <!-- Left Sidebar -->
+        <td class="sidebar">
+
+          <div class="sidebar-box">
+            <h3>About This Site</h3>
+            <p>A personal travel diary following my 3-4 week adventure through New Zealand. Updated from the road!</p>
+          </div>
+
+          <div class="sidebar-box">
+            <h3>Navigation</h3>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="#guestbook">Guestbook</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-box">
+            <h3>Hit Counter</h3>
+            <div class="hit-counter">
+              <p>You are visitor #</p>
+              <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fthekeeks.github.io%2Fnz_logs&title=Visitors" alt="Hit counter">
+            </div>
+          </div>
+
+          <div class="sidebar-box instagram-sidebar">
+            <h3>Instagram</h3>
+            <iframe src="https://www.instagram.com/nz_logs/embed" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+          </div>
+
+          <div class="sidebar-box">
+            <h3>Links</h3>
+            <ul>
+              <li><a href="https://www.newzealand.com" target="_blank">NZ Tourism</a></li>
+              <li><a href="https://www.doc.govt.nz" target="_blank">DOC NZ</a></li>
+            </ul>
+          </div>
+
+        </td>
+
+        <!-- Main Content -->
+        <td class="main-content">
+          <div id="posts-container">
+            <p class="no-posts">Loading posts...</p>
+          </div>
+
+          <!-- Guestbook -->
+          <div class="guestbook-section" id="guestbook">
+            <h2>Sign My Guestbook!</h2>
+            <div class="sidebar-box">
+              <p><i>Leave a message below using your GitHub account. Powered by Giscus &amp; GitHub Discussions.</i></p>
+              <!-- Giscus widget — replace data-repo, data-repo-id, data-category, data-category-id with your values -->
+              <script src="https://giscus.app/client.js"
+                data-repo="thekeeks/nz_logs"
+                data-repo-id="YOUR_REPO_ID"
+                data-category="Guestbook"
+                data-category-id="YOUR_CATEGORY_ID"
+                data-mapping="pathname"
+                data-strict="0"
+                data-reactions-enabled="1"
+                data-emit-metadata="0"
+                data-input-position="top"
+                data-theme="light"
+                data-lang="en"
+                crossorigin="anonymous"
+                async>
+              </script>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Footer -->
+    <div class="site-footer">
+      &copy; 2026 TheKeeks | Made with &hearts; and dial-up nostalgia
+    </div>
+
+  </div>
+</div>
+
+<script src="js/instagram.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

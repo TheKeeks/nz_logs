@@ -1,0 +1,343 @@
+/* ============================================
+   NZ Travel Blog — Web 1.0 / Windows 98 Style
+   ============================================ */
+
+body {
+  background-color: #c0c0c0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  color: #000000;
+  margin: 0;
+  padding: 0;
+}
+
+a:link { color: #0000EE; }
+a:visited { color: #551A8B; }
+a:active { color: #FF0000; }
+
+/* Page container — centered dialog box feel */
+.page-container {
+  width: 760px;
+  margin: 10px auto;
+  background-color: #ffffff;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  border-right: 2px solid #808080;
+  padding: 0;
+}
+
+/* Title bar */
+.title-bar {
+  background: linear-gradient(to right, #000080, #1084d0);
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 3px 6px;
+  margin: 0;
+}
+
+/* Inner content padding */
+.page-inner {
+  padding: 8px;
+}
+
+/* Header section */
+.site-header {
+  text-align: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #808080;
+  margin-bottom: 8px;
+}
+
+.site-header h1 {
+  font-size: 22px;
+  margin: 4px 0;
+}
+
+.site-header .last-updated {
+  font-size: 11px;
+  color: #666666;
+  font-style: italic;
+}
+
+/* Marquee */
+.marquee-container {
+  border: 1px solid #808080;
+  background-color: #e8e8e8;
+  padding: 2px 4px;
+  font-size: 12px;
+  margin: 6px 0;
+}
+
+.marquee-container marquee {
+  margin: 0;
+}
+
+/* Main layout table */
+.layout-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.layout-table td {
+  vertical-align: top;
+  padding: 4px;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 180px;
+  font-size: 12px;
+}
+
+.sidebar-box {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  background-color: #f0f0f0;
+  padding: 6px;
+  margin-bottom: 8px;
+}
+
+.sidebar-box h3 {
+  font-size: 12px;
+  margin: 0 0 4px 0;
+  border-bottom: 1px solid #808080;
+  padding-bottom: 2px;
+}
+
+.sidebar-box ul {
+  list-style: square;
+  padding-left: 18px;
+  margin: 4px 0;
+}
+
+.sidebar-box li {
+  margin-bottom: 2px;
+}
+
+.sidebar-box p {
+  margin: 4px 0;
+}
+
+/* Instagram sidebar embed */
+.instagram-sidebar iframe {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  width: 170px;
+  height: 400px;
+}
+
+/* Hit counter */
+.hit-counter {
+  text-align: center;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.hit-counter img {
+  display: block;
+  margin: 4px auto;
+}
+
+/* Main content area */
+.main-content {
+  border-left: 1px solid #c0c0c0;
+  padding-left: 8px;
+}
+
+/* Post cards */
+.post {
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+}
+
+.post .post-date {
+  font-size: 11px;
+  color: #666666;
+}
+
+.post .post-location {
+  font-size: 11px;
+  color: #336633;
+  font-style: italic;
+}
+
+.post h2 {
+  font-size: 16px;
+  margin: 4px 0;
+}
+
+.post .post-body {
+  line-height: 1.5;
+}
+
+.post .post-body p {
+  margin: 6px 0;
+}
+
+.post hr {
+  border: none;
+  border-top: 1px solid #c0c0c0;
+  margin: 12px 0;
+}
+
+/* Instagram embeds in posts */
+.post .instagram-embed {
+  margin: 8px 0;
+  text-align: center;
+}
+
+.post .instagram-embed blockquote {
+  margin: 0 auto;
+}
+
+/* Guestbook section */
+.guestbook-section {
+  border-top: 2px solid #808080;
+  margin-top: 12px;
+  padding-top: 8px;
+}
+
+.guestbook-section h2 {
+  font-size: 16px;
+  margin: 4px 0 8px 0;
+}
+
+/* Footer */
+.site-footer {
+  text-align: center;
+  font-size: 11px;
+  color: #666666;
+  border-top: 1px solid #808080;
+  padding: 6px 0;
+  margin-top: 8px;
+}
+
+/* Windows 98 Buttons */
+.btn {
+  background-color: #d4d0c8;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  border-right: 2px solid #808080;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-family: Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+
+.btn:active {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+}
+
+/* Empty state */
+.no-posts {
+  text-align: center;
+  color: #888888;
+  font-style: italic;
+  padding: 40px 0;
+}
+
+/* ============================================
+   Admin Page Styles
+   ============================================ */
+
+.admin-section {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  background-color: #f0f0f0;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+.admin-section h2 {
+  font-size: 14px;
+  margin: 0 0 8px 0;
+  border-bottom: 1px solid #808080;
+  padding-bottom: 4px;
+}
+
+.admin-section label {
+  display: block;
+  font-size: 12px;
+  margin: 6px 0 2px 0;
+  font-weight: bold;
+}
+
+.admin-section input[type="text"],
+.admin-section input[type="date"],
+.admin-section textarea {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  background-color: #ffffff;
+  padding: 2px 4px;
+  width: 95%;
+}
+
+.admin-section textarea {
+  height: 200px;
+  resize: vertical;
+}
+
+.admin-buttons {
+  margin-top: 8px;
+}
+
+.admin-buttons .btn {
+  margin-right: 6px;
+}
+
+/* Preview area */
+.preview-area {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  background-color: #ffffff;
+  padding: 10px;
+  margin-top: 8px;
+  min-height: 100px;
+  display: none;
+}
+
+.preview-area h3 {
+  font-size: 12px;
+  margin: 0 0 6px 0;
+  color: #666666;
+}
+
+/* Status messages */
+.status-msg {
+  padding: 4px 8px;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.status-msg.success {
+  background-color: #c8ffc8;
+  border: 1px solid #008000;
+}
+
+.status-msg.error {
+  background-color: #ffc8c8;
+  border: 1px solid #cc0000;
+}
+
+.status-msg.info {
+  background-color: #c8e0ff;
+  border: 1px solid #0066cc;
+}
