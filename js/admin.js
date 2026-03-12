@@ -7,7 +7,7 @@ var CONFIG = {
   branch: "main",
   postsFile: "posts.json",
   passwordHash:
-    "3da5f8dd20938668226c6921b5e47758a2bdfb7f16c5de5690bff6c6f969a629",
+    "1a5afeda973d776e31d1d7266f184468f84d99bed311d88d3dcb67015934f9f9",
 };
 
 function getToken() {
