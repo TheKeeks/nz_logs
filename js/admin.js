@@ -7,16 +7,22 @@ var CONFIG = {
   branch: "main",
   postsFile: "posts.json",
   passwordHash:
-    "3da5f8dd20938668226c6921b5e47758a2bdfb7f16c5de5690bff6c6f969a629",
+    "1a5afeda973d776e31d1d7266f184468f84d99bed311d88d3dcb67015934f9f9",
 };
 
 function getToken() {
-  var token = sessionStorage.getItem("gh_pat");
-  if (!token) {
-    token = prompt("Enter your GitHub Personal Access Token:");
-    if (token) sessionStorage.setItem("gh_pat", token);
-  }
-  return token;
+  return localStorage.getItem("gh_pat");
+}
+
+function promptForToken() {
+  if (getToken()) return;
+  var token = prompt("First-time setup: paste your GitHub Personal Access Token.\nThis is saved locally and never leaves your browser.");
+  if (token) localStorage.setItem("gh_pat", token);
+}
+
+function clearToken() {
+  localStorage.removeItem("gh_pat");
+  promptForToken();
 }
 
 (function () {
@@ -58,6 +64,9 @@ function getToken() {
   }
 
   function initAdmin() {
+    // Prompt for GitHub token on first-time setup
+    promptForToken();
+
     // Auto-fill date
     var dateInput = document.getElementById("post-date");
     if (dateInput) {
@@ -77,6 +86,9 @@ function getToken() {
     document
       .getElementById("btn-save-marquee")
       .addEventListener("click", saveMarquee);
+    document
+      .getElementById("btn-update-token")
+      .addEventListener("click", clearToken);
 
     // Load current marquee text
     loadCurrentMarquee();
