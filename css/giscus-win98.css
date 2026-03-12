@@ -46,15 +46,15 @@ main {
   --color-btn-active-border: #808080;
   --color-btn-selected-bg: #c0bdb5;
 
-  /* Primary button — Win98 accent (navy-ish) */
-  --color-btn-primary-text: #ffffff;
-  --color-btn-primary-bg: #000080;
+  /* Primary button — gray OG Win98 style */
+  --color-btn-primary-text: #000000;
+  --color-btn-primary-bg: #d4d0c8;
   --color-btn-primary-border: #808080;
   --color-btn-primary-shadow: none;
   --color-btn-primary-inset-shadow: none;
-  --color-btn-primary-hover-bg: #0000a0;
+  --color-btn-primary-hover-bg: #e0dcd4;
   --color-btn-primary-hover-border: #808080;
-  --color-btn-primary-selected-bg: #000060;
+  --color-btn-primary-selected-bg: #c0bdb5;
   --color-btn-primary-selected-shadow: none;
   --color-btn-primary-disabled-text: #808080;
   --color-btn-primary-disabled-bg: #d4d0c8;
