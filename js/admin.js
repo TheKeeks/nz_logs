@@ -3,13 +3,21 @@
    ============================================ */
 
 var CONFIG = {
-  githubToken: "YOUR_PAT_HERE", // Fine-grained PAT, contents:write only
   repo: "thekeeks/nz_logs",
   branch: "main",
   postsFile: "posts.json",
   passwordHash:
     "3da5f8dd20938668226c6921b5e47758a2bdfb7f16c5de5690bff6c6f969a629",
 };
+
+function getToken() {
+  var token = sessionStorage.getItem("gh_pat");
+  if (!token) {
+    token = prompt("Enter your GitHub Personal Access Token:");
+    if (token) sessionStorage.setItem("gh_pat", token);
+  }
+  return token;
+}
 
 (function () {
   var authenticated = false;
@@ -265,7 +273,7 @@ var CONFIG = {
 
     return fetch(url, {
       headers: {
-        Authorization: "Bearer " + CONFIG.githubToken,
+        Authorization: "Bearer " + getToken(),
         Accept: "application/vnd.github.v3+json",
       },
     })
@@ -292,7 +300,7 @@ var CONFIG = {
     return fetch(url, {
       method: "PUT",
       headers: {
-        Authorization: "Bearer " + CONFIG.githubToken,
+        Authorization: "Bearer " + getToken(),
         Accept: "application/vnd.github.v3+json",
         "Content-Type": "application/json",
       },
