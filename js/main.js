@@ -10,6 +10,7 @@ var CONFIG = {
 (function () {
   document.addEventListener("DOMContentLoaded", function () {
     loadPosts();
+    loadVisitorCount();
   });
 
   function loadPosts() {
@@ -107,6 +108,22 @@ var CONFIG = {
         Instagram.processEmbeds();
       });
     });
+  }
+
+  function loadVisitorCount() {
+    var el = document.getElementById("visitor-count");
+    if (!el) return;
+    fetch("https://hitscounter.dev/api/hit?url=https%3A%2F%2Fthekeeks.github.io%2Fnz_logs&output=json")
+      .then(function (res) {
+        if (!res.ok) throw new Error("Failed to load visitor count");
+        return res.json();
+      })
+      .then(function (data) {
+        el.textContent = data.total_hits;
+      })
+      .catch(function () {
+        el.textContent = "?";
+      });
   }
 
   function escapeHtml(str) {
