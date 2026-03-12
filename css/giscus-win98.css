@@ -1,0 +1,138 @@
+/*! Windows 98 Theme for Giscus
+ *  Matches the NZ Travel Blog retro aesthetic
+ */
+
+main {
+  --color-prettylights-syntax-comment: #6e7781;
+  --color-prettylights-syntax-constant: #0550ae;
+  --color-prettylights-syntax-entity: #8250df;
+  --color-prettylights-syntax-storage-modifier-import: #24292f;
+  --color-prettylights-syntax-entity-tag: #116329;
+  --color-prettylights-syntax-keyword: #cf222e;
+  --color-prettylights-syntax-string: #0a3069;
+  --color-prettylights-syntax-variable: #953800;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #82071e;
+  --color-prettylights-syntax-invalid-illegal-text: #f6f8fa;
+  --color-prettylights-syntax-invalid-illegal-bg: #82071e;
+  --color-prettylights-syntax-carriage-return-text: #f6f8fa;
+  --color-prettylights-syntax-carriage-return-bg: #cf222e;
+  --color-prettylights-syntax-string-regexp: #116329;
+  --color-prettylights-syntax-markup-list: #3b2300;
+  --color-prettylights-syntax-markup-heading: #0550ae;
+  --color-prettylights-syntax-markup-italic: #24292f;
+  --color-prettylights-syntax-markup-bold: #24292f;
+  --color-prettylights-syntax-markup-deleted-text: #82071e;
+  --color-prettylights-syntax-markup-deleted-bg: #ffebe9;
+  --color-prettylights-syntax-markup-inserted-text: #116329;
+  --color-prettylights-syntax-markup-inserted-bg: #dafbe1;
+  --color-prettylights-syntax-markup-changed-text: #953800;
+  --color-prettylights-syntax-markup-changed-bg: #ffd8b5;
+  --color-prettylights-syntax-markup-ignored-text: #eaeef2;
+  --color-prettylights-syntax-markup-ignored-bg: #0550ae;
+  --color-prettylights-syntax-meta-diff-range: #8250df;
+  --color-prettylights-syntax-brackethighlighter-angle: #57606a;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #8c959f;
+  --color-prettylights-syntax-constant-other-reference-link: #0a3069;
+
+  /* Buttons — Win98 raised 3D style */
+  --color-btn-text: #000000;
+  --color-btn-bg: #d4d0c8;
+  --color-btn-border: #808080;
+  --color-btn-shadow: none;
+  --color-btn-inset-shadow: none;
+  --color-btn-hover-bg: #e0dcd4;
+  --color-btn-hover-border: #808080;
+  --color-btn-active-bg: #c0bdb5;
+  --color-btn-active-border: #808080;
+  --color-btn-selected-bg: #c0bdb5;
+
+  /* Primary button — Win98 accent (navy-ish) */
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-bg: #000080;
+  --color-btn-primary-border: #808080;
+  --color-btn-primary-shadow: none;
+  --color-btn-primary-inset-shadow: none;
+  --color-btn-primary-hover-bg: #0000a0;
+  --color-btn-primary-hover-border: #808080;
+  --color-btn-primary-selected-bg: #000060;
+  --color-btn-primary-selected-shadow: none;
+  --color-btn-primary-disabled-text: #808080;
+  --color-btn-primary-disabled-bg: #d4d0c8;
+  --color-btn-primary-disabled-border: #808080;
+
+  --color-action-list-item-default-hover-bg: #e0dcd4;
+  --color-segmented-control-bg: #d4d0c8;
+  --color-segmented-control-button-bg: #f0f0f0;
+  --color-segmented-control-button-selected-border: #808080;
+
+  /* Text colors */
+  --color-fg-default: #000000;
+  --color-fg-muted: #444444;
+  --color-fg-subtle: #666666;
+
+  /* Canvas — Win98 gray palette */
+  --color-canvas-default: #f0f0f0;
+  --color-canvas-overlay: #f0f0f0;
+  --color-canvas-inset: #ffffff;
+  --color-canvas-subtle: #e8e8e8;
+
+  /* Borders — Win98 gray */
+  --color-border-default: #808080;
+  --color-border-muted: #c0c0c0;
+
+  --color-neutral-muted: rgb(192 192 192 / 30%);
+
+  /* Accent — classic blue links */
+  --color-accent-fg: #0000ee;
+  --color-accent-emphasis: #000080;
+  --color-accent-muted: rgb(0 0 128 / 30%);
+  --color-accent-subtle: #e0e0ff;
+
+  /* Status colors */
+  --color-success-fg: #008000;
+  --color-attention-fg: #996600;
+  --color-attention-muted: rgb(153 102 0 / 30%);
+  --color-attention-subtle: #ffffcc;
+  --color-danger-fg: #cc0000;
+  --color-danger-muted: rgb(204 0 0 / 30%);
+  --color-danger-subtle: #ffe0e0;
+
+  --color-primer-shadow-inset: none;
+  --color-scale-gray-1: #e8e8e8;
+  --color-scale-blue-1: #c0c0ff;
+
+  --color-social-reaction-bg-hover: var(--color-scale-gray-1);
+  --color-social-reaction-bg-reacted-hover: var(--color-scale-blue-1);
+}
+
+/* Win98 beveled borders on comment boxes */
+main .gsc-comment-box {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+}
+
+/* Win98 beveled borders on individual comments */
+main .gsc-comment {
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  border-right: 2px solid #808080;
+  background-color: #f0f0f0;
+}
+
+/* Font matching */
+main {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+}
+
+/* Loading indicator */
+main .pagination-loader-container {
+  background-image: url("https://github.com/images/modules/pulls/progressive-disclosure-line.svg");
+}
+
+main .gsc-loading-image {
+  background-image: url("https://github.githubassets.com/images/mona-loading-default.gif");
+}
