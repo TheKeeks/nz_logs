@@ -139,9 +139,10 @@ a:active { color: #FF0000; }
   margin-top: 4px;
 }
 
-.hit-counter img {
-  display: block;
-  margin: 4px auto;
+#visitor-count {
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+  font-size: 13px;
 }
 
 /* Main content area */

@@ -10,7 +10,32 @@ var CONFIG = {
 (function () {
   document.addEventListener("DOMContentLoaded", function () {
     loadPosts();
+    loadVisitorCount();
   });
+
+  function loadVisitorCount() {
+    var el = document.getElementById("visitor-count");
+    if (!el) return;
+
+    fetch("https://hitscounter.dev/api/hit?url=https%3A%2F%2Fthekeeks.github.io%2Fnz_logs&label=Visitors&icon=eye&color=blue")
+      .then(function (res) { return res.text(); })
+      .then(function (svg) {
+        var match = svg.match(/<text[^>]*>(\d[\d,]*)\s*\/\s*(\d[\d,]*)<\/text>/);
+        if (match) {
+          el.textContent = match[2];
+        } else {
+          var nums = svg.match(/>(\d[\d,]*)<\/text>/g);
+          if (nums && nums.length >= 2) {
+            el.textContent = nums[nums.length - 1].replace(/<\/text>/, "").replace(/^>/, "");
+          } else {
+            el.textContent = "?";
+          }
+        }
+      })
+      .catch(function () {
+        el.textContent = "?";
+      });
+  }
 
   function loadPosts() {
     fetch(CONFIG.postsFile + "?t=" + Date.now())
