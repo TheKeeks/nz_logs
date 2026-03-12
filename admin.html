@@ -37,10 +37,17 @@
         <button class="btn" id="btn-embed-instagram">Embed Instagram Post</button>
         <button class="btn" id="btn-preview">Preview</button>
         <button class="btn" id="btn-publish">Publish Post</button>
+        <button class="btn" onclick="window._cancelEdit()" style="display:none;" id="btn-cancel-edit">Cancel Edit</button>
       </div>
 
       <div id="preview-area" class="preview-area"></div>
       <div id="status-msg" class="status-msg" style="display:none;"></div>
+    </div>
+
+    <!-- Existing Posts -->
+    <div class="admin-section">
+      <h2>Existing Posts</h2>
+      <div id="posts-list"><p style="color:#888; font-style:italic;">Loading posts...</p></div>
     </div>
 
     <!-- Marquee Settings -->

@@ -27,6 +27,7 @@ function clearToken() {
 
 (function () {
   var authenticated = false;
+  var editingPostId = null;
 
   document.addEventListener("DOMContentLoaded", function () {
     checkPassword();
@@ -90,8 +91,9 @@ function clearToken() {
       .getElementById("btn-update-token")
       .addEventListener("click", clearToken);
 
-    // Load current marquee text
+    // Load current marquee text and posts list
     loadCurrentMarquee();
+    loadPostsList();
   }
 
   function loadCurrentMarquee() {
@@ -104,6 +106,99 @@ function clearToken() {
       }
     });
   }
+
+  function loadPostsList() {
+    var container = document.getElementById("posts-list");
+    if (!container) return;
+
+    fetchPostsJson().then(function (result) {
+      var posts = (result.data && result.data.posts) || [];
+      if (posts.length === 0) {
+        container.innerHTML = '<p style="color:#888; font-style:italic;">No posts yet.</p>';
+        return;
+      }
+
+      var html = "";
+      posts.forEach(function (post) {
+        html += '<div style="border-bottom:1px solid #c0c0c0; padding:4px 0; display:flex; justify-content:space-between; align-items:center;">';
+        html += '<div><strong>' + escapeHtml(post.title) + '</strong>';
+        html += ' <span style="color:#666; font-size:11px;">(' + escapeHtml(post.date) + ')</span>';
+        if (post.location) html += ' <span style="color:#336633; font-size:11px;">' + escapeHtml(post.location) + '</span>';
+        html += '</div>';
+        html += '<div>';
+        html += '<button class="btn" onclick="window._editPost(\'' + escapeHtml(post.id) + '\')">Edit</button> ';
+        html += '<button class="btn" onclick="window._deletePost(\'' + escapeHtml(post.id) + '\')">Delete</button>';
+        html += '</div></div>';
+      });
+      container.innerHTML = html;
+    }).catch(function () {
+      container.innerHTML = '<p style="color:#cc0000;">Failed to load posts.</p>';
+    });
+  }
+
+  window._editPost = function (postId) {
+    fetchPostsJson().then(function (result) {
+      var posts = (result.data && result.data.posts) || [];
+      var post = null;
+      for (var i = 0; i < posts.length; i++) {
+        if (posts[i].id === postId) { post = posts[i]; break; }
+      }
+      if (!post) {
+        showStatus("Post not found.", "error");
+        return;
+      }
+
+      document.getElementById("post-title").value = post.title || "";
+      document.getElementById("post-location").value = post.location || "";
+      document.getElementById("post-date").value = post.date || "";
+      document.getElementById("post-body").value = post.body || "";
+
+      editingPostId = postId;
+      document.getElementById("btn-publish").textContent = "Update Post";
+      document.getElementById("btn-cancel-edit").style.display = "inline-block";
+
+      showStatus("Editing: " + post.title + ". Make changes and click Update Post.", "info");
+      window.scrollTo(0, 0);
+    });
+  };
+
+  window._cancelEdit = function () {
+    editingPostId = null;
+    document.getElementById("post-title").value = "";
+    document.getElementById("post-location").value = "";
+    document.getElementById("post-date").value = new Date().toISOString().split("T")[0];
+    document.getElementById("post-body").value = "";
+    document.getElementById("btn-publish").textContent = "Publish Post";
+    document.getElementById("btn-cancel-edit").style.display = "none";
+    document.getElementById("preview-area").style.display = "none";
+    showStatus("Edit cancelled.", "info");
+  };
+
+  window._deletePost = function (postId) {
+    if (!confirm("Are you sure you want to delete this post? This cannot be undone.")) return;
+
+    showStatus("Deleting post...", "info");
+
+    fetchPostsJson().then(function (result) {
+      var data = result.data;
+      var sha = result.sha;
+      var posts = data.posts || [];
+      var title = "";
+
+      data.posts = posts.filter(function (p) {
+        if (p.id === postId) { title = p.title; return false; }
+        return true;
+      });
+
+      return commitPostsJson(data, sha, "Delete post: " + title);
+    }).then(function () {
+      showStatus("Post deleted. Site will update in ~30 seconds.", "success");
+      if (editingPostId === postId) window._cancelEdit();
+      loadPostsList();
+    }).catch(function (err) {
+      showStatus("Error deleting: " + err.message, "error");
+    });
+  };
 
   function embedInstagram() {
     var url = prompt("Paste Instagram post URL:");
@@ -192,14 +287,28 @@ function clearToken() {
           var sha = result.sha;
 
           if (!data.posts) data.posts = [];
-          data.posts.unshift(newPost);
 
-          return commitPostsJson(data, sha, "Add post: " + title);
+          if (editingPostId) {
+            // Update existing post
+            for (var i = 0; i < data.posts.length; i++) {
+              if (data.posts[i].id === editingPostId) {
+                data.posts[i] = newPost;
+                data.posts[i].id = editingPostId;
+                break;
+              }
+            }
+            return commitPostsJson(data, sha, "Edit post: " + title);
+          } else {
+            data.posts.unshift(newPost);
+            return commitPostsJson(data, sha, "Add post: " + title);
+          }
         });
       })
       .then(function () {
-        showStatus("Post published successfully! Site will update in ~30 seconds.", "success");
-        // Clear form
+        var msg = editingPostId ? "Post updated" : "Post published";
+        showStatus(msg + " successfully! Site will update in ~30 seconds.", "success");
+        // Clear form and reset editing state
+        editingPostId = null;
         document.getElementById("post-title").value = "";
         document.getElementById("post-body").value = "";
         document.getElementById("post-location").value = "";
@@ -207,6 +316,9 @@ function clearToken() {
           .toISOString()
           .split("T")[0];
         document.getElementById("preview-area").style.display = "none";
+        document.getElementById("btn-publish").textContent = "Publish Post";
+        document.getElementById("btn-cancel-edit").style.display = "none";
+        loadPostsList();
       })
       .catch(function (err) {
         showStatus("Error publishing: " + err.message, "error");
