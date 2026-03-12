@@ -151,7 +151,7 @@ function clearToken() {
       document.getElementById("post-title").value = post.title || "";
       document.getElementById("post-location").value = post.location || "";
       document.getElementById("post-date").value = post.date || "";
-      document.getElementById("post-body").value = post.body || "";
+      document.getElementById("post-body").value = (post.body || "").replace(/<br>/g, "\n");
 
       editingPostId = postId;
       document.getElementById("btn-publish").textContent = "Update Post";
@@ -237,6 +237,8 @@ function clearToken() {
     var location = document.getElementById("post-location").value;
     var date = document.getElementById("post-date").value;
 
+    body = body.replace(/\n/g, "<br>");
+
     var html = "";
     if (date) html += '<div class="post-date">\ud83d\udcc5 ' + date + "</div>";
     if (location)
@@ -255,6 +257,8 @@ function clearToken() {
     var body = document.getElementById("post-body").value.trim();
     var location = document.getElementById("post-location").value.trim();
     var date = document.getElementById("post-date").value.trim();
+
+    body = body.replace(/\n/g, "<br>");
 
     if (!title || !body) {
       showStatus("Title and body are required.", "error");
