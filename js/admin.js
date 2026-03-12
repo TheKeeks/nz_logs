@@ -3,8 +3,8 @@
    ============================================ */
 
 var CONFIG = {
-  repo: "thekeeks/nz_logs",
-  branch: "main",
+  repo: "TheKeeks/nz_logs",
+  branch: "Main",
   postsFile: "posts.json",
   passwordHash:
     "1a5afeda973d776e31d1d7266f184468f84d99bed311d88d3dcb67015934f9f9",
