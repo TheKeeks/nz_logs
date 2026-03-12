@@ -9,7 +9,7 @@ A nostalgic Web 1.0-style personal travel diary for a New Zealand trip. Built wi
 - In-browser admin panel for publishing (no local editing needed)
 - Posts stored in `posts.json`, committed via GitHub API
 - Guestbook powered by Giscus (GitHub Discussions)
-- Hit counter via hits.seeyoufarm.com
+- Hit counter via hitscounter.dev
 - Scrolling `<marquee>` status message
 
 ## Setup Instructions
@@ -111,5 +111,5 @@ The Instagram sidebar embed uses the handle `nz_logs`. To change it:
 - **Data:** `posts.json` flat file in the repo
 - **Publishing:** GitHub Contents API (browser-side commits)
 - **Comments:** Giscus (GitHub Discussions)
-- **Analytics:** hits.seeyoufarm.com hit counter
+- **Analytics:** hitscounter.dev hit counter
 - **Photos:** Instagram oEmbed API
