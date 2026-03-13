@@ -410,7 +410,7 @@ function clearToken() {
         return res.json();
       })
       .then(function (file) {
-        var content = atob(file.content);
+        var content = decodeURIComponent(escape(atob(file.content)));
         var data = JSON.parse(content);
         return { data: data, sha: file.sha };
       });
