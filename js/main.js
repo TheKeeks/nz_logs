@@ -18,10 +18,10 @@ var CONFIG = {
     var myEl = document.getElementById("my-visitor-number");
     if (!totalEl) return;
 
-    fetch("https://count.cab/hit/ghp_thekeeks_nz_logs")
-      .then(function (res) { return res.text(); })
-      .then(function (count) {
-        count = count.trim();
+    fetch("https://api.counterapi.dev/v1/thekeeks-nz-logs/visits/up")
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        var count = String(data.count);
         totalEl.textContent = count;
 
         // Store device-specific visitor number on first visit
