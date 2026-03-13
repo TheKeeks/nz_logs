@@ -109,6 +109,26 @@
     return html;
   }
 
+  /* ---- NZ geographic filter ----
+     Pins outside this bounding box are skipped so the map stays
+     focused on New Zealand and doesn't zoom out to show far-away
+     departure cities (e.g. New York). */
+  var NZ_BOUNDS = {
+    latMin: -47.5,
+    latMax: -34.0,
+    lngMin: 166.0,
+    lngMax: 178.6,
+  };
+
+  function inNZ(latlng) {
+    return (
+      latlng[0] >= NZ_BOUNDS.latMin &&
+      latlng[0] <= NZ_BOUNDS.latMax &&
+      latlng[1] >= NZ_BOUNDS.lngMin &&
+      latlng[1] <= NZ_BOUNDS.lngMax
+    );
+  }
+
   /* ---- Map initialisation ---- */
 
   function initMap(posts) {
@@ -128,8 +148,8 @@
       }
     ).addTo(map);
 
-    // Default view while pins load
-    map.setView([0, 0], 2);
+    // Default view: New Zealand, while pins load
+    map.setView([-41.3, 172.5], 5);
 
     // Group published posts with locations by their location string
     var locationGroups = {};
@@ -152,7 +172,7 @@
       setTimeout(function () {
         geocode(loc, function (latlng) {
           done++;
-          if (latlng) {
+          if (latlng && inNZ(latlng)) {
             bounds.extend(latlng);
             var posts = locationGroups[loc];
 
