@@ -90,6 +90,14 @@ function clearToken() {
     document
       .getElementById("btn-update-token")
       .addEventListener("click", clearToken);
+    document
+      .getElementById("btn-insert-image")
+      .addEventListener("click", function () {
+        document.getElementById("image-file-input").click();
+      });
+    document
+      .getElementById("image-file-input")
+      .addEventListener("change", handleImageFileSelected);
 
     // Load current marquee text and posts list
     loadCurrentMarquee();
@@ -223,6 +231,93 @@ function clearToken() {
     textarea.focus();
 
     showStatus("Instagram embed placeholder inserted.", "info");
+  }
+
+  function handleImageFileSelected(event) {
+    var file = event.target.files[0];
+    event.target.value = ""; // reset so same file can be re-selected
+    if (!file || !file.type.startsWith("image/")) {
+      showStatus("Please select an image file.", "error");
+      return;
+    }
+    var caption = prompt("Enter a caption for this image (or leave blank):") || "";
+    showStatus("Uploading image...", "info");
+    uploadImageToGitHub(file)
+      .then(function (imagePath) {
+        insertImageHtmlAtCursor(imagePath, caption);
+        showStatus("Image uploaded and inserted!", "success");
+      })
+      .catch(function (err) {
+        showStatus("Image upload failed: " + err.message, "error");
+      });
+  }
+
+  function uploadImageToGitHub(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var base64 = e.target.result.split(",")[1]; // strip data URI prefix
+        var timestamp = Date.now();
+        var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").toLowerCase();
+        var filename = timestamp + "_" + safeName;
+        var url =
+          "https://api.github.com/repos/" +
+          CONFIG.repo +
+          "/contents/images/" +
+          filename;
+        fetch(url, {
+          method: "PUT",
+          headers: {
+            Authorization: "Bearer " + getToken(),
+            Accept: "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: "Add image: " + filename,
+            content: base64,
+            branch: CONFIG.branch,
+          }),
+        })
+          .then(function (res) {
+            if (!res.ok) {
+              return res.json().then(function (err) {
+                throw new Error(err.message || "Upload failed: " + res.status);
+              });
+            }
+            return res.json();
+          })
+          .then(function () {
+            resolve("images/" + filename);
+          })
+          .catch(reject);
+      };
+      reader.onerror = function () {
+        reject(new Error("Failed to read file."));
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function insertImageHtmlAtCursor(imagePath, caption) {
+    var textarea = document.getElementById("post-body");
+    var altText = caption || "Image";
+    // Single line — avoids extra <br> tags when publishPost runs replace(/\n/g, "<br>")
+    var figureHtml =
+      '<figure class="post-image"><img src="' +
+      imagePath +
+      '" alt="' +
+      altText +
+      '"><figcaption><strong>' +
+      caption +
+      "</strong></figcaption></figure>";
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var text = textarea.value;
+    textarea.value =
+      text.substring(0, start) + "\n" + figureHtml + "\n" + text.substring(end);
+    textarea.selectionStart = textarea.selectionEnd =
+      start + figureHtml.length + 2;
+    textarea.focus();
   }
 
   function togglePreview() {

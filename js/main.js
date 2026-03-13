@@ -9,6 +9,7 @@ var CONFIG = {
 
 (function () {
   document.addEventListener("DOMContentLoaded", function () {
+    initLightbox();
     loadPosts();
     loadVisitorCount();
   });
@@ -122,6 +123,13 @@ var CONFIG = {
 
     container.innerHTML = html;
 
+    // Lightbox delegation — bound to container since innerHTML is replaced on each render
+    container.addEventListener("click", function (e) {
+      var img = e.target.closest(".post-image img");
+      if (!img) return;
+      openLightbox(img.src, img.getAttribute("alt") || "");
+    });
+
     // Process any Instagram embeds already in the HTML
     Instagram.processEmbeds();
 
@@ -138,6 +146,46 @@ var CONFIG = {
         Instagram.processEmbeds();
       });
     });
+  }
+
+  function initLightbox() {
+    if (document.getElementById("lightbox-overlay")) return;
+    var overlay = document.createElement("div");
+    overlay.id = "lightbox-overlay";
+    overlay.innerHTML =
+      '<div id="lightbox-dialog">' +
+        '<div id="lightbox-titlebar">' +
+          '<span id="lightbox-title">Image</span>' +
+          '<button id="lightbox-close-btn">X</button>' +
+        "</div>" +
+        '<div id="lightbox-body"><img id="lightbox-img" src="" alt=""></div>' +
+        '<div id="lightbox-caption"></div>' +
+      "</div>";
+    document.body.appendChild(overlay);
+    document
+      .getElementById("lightbox-close-btn")
+      .addEventListener("click", closeLightbox);
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) closeLightbox();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeLightbox();
+    });
+  }
+
+  function openLightbox(src, alt) {
+    document.getElementById("lightbox-img").src = src;
+    document.getElementById("lightbox-img").alt = alt;
+    document.getElementById("lightbox-title").textContent = alt || "Image";
+    document.getElementById("lightbox-caption").textContent = alt;
+    document.getElementById("lightbox-overlay").classList.add("active");
+  }
+
+  function closeLightbox() {
+    var overlay = document.getElementById("lightbox-overlay");
+    if (overlay) overlay.classList.remove("active");
+    var img = document.getElementById("lightbox-img");
+    if (img) img.src = "";
   }
 
   function escapeHtml(str) {
