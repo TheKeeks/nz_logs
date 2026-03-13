@@ -14,26 +14,32 @@ var CONFIG = {
   });
 
   function loadVisitorCount() {
-    var el = document.getElementById("visitor-count");
-    if (!el) return;
+    var totalEl = document.getElementById("visitor-count");
+    var myEl = document.getElementById("my-visitor-number");
+    if (!totalEl) return;
 
-    fetch("https://hitscounter.dev/api/hit?url=https%3A%2F%2Fthekeeks.github.io%2Fnz_logs&label=Visitors&icon=eye&color=blue")
+    fetch("https://count.cab/hit/ghp_thekeeks_nz_logs")
       .then(function (res) { return res.text(); })
-      .then(function (svg) {
-        var match = svg.match(/<text[^>]*>(\d[\d,]*)\s*\/\s*(\d[\d,]*)<\/text>/);
-        if (match) {
-          el.textContent = match[2];
-        } else {
-          var nums = svg.match(/>(\d[\d,]*)<\/text>/g);
-          if (nums && nums.length >= 2) {
-            el.textContent = nums[nums.length - 1].replace(/<\/text>/, "").replace(/^>/, "");
-          } else {
-            el.textContent = "?";
+      .then(function (count) {
+        count = count.trim();
+        totalEl.textContent = count;
+
+        // Store device-specific visitor number on first visit
+        if (myEl) {
+          var myNumber = localStorage.getItem("nz_logs_my_visitor_number");
+          if (!myNumber) {
+            myNumber = count;
+            localStorage.setItem("nz_logs_my_visitor_number", myNumber);
           }
+          myEl.textContent = myNumber;
         }
       })
       .catch(function () {
-        el.textContent = "?";
+        if (totalEl) totalEl.textContent = "?";
+        if (myEl) {
+          var stored = localStorage.getItem("nz_logs_my_visitor_number");
+          myEl.textContent = stored || "?";
+        }
       });
   }
 
