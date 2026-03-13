@@ -5,6 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>NZ Logs</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script async src="//www.instagram.com/embed.js"></script>
 </head>
 <body>
@@ -26,6 +27,12 @@
       </marquee>
     </div>
 
+    <!-- Visit Map -->
+    <div class="map-section" id="map-section">
+      <div class="map-section-title">&#128205; Where We've Been</div>
+      <div id="visit-map"></div>
+    </div>
+
     <!-- Main Layout Table -->
     <table class="layout-table">
       <tr>
@@ -41,6 +48,7 @@
             <h3>Navigation</h3>
             <ul>
               <li><a href="index.html">Home</a></li>
+              <li><a href="#map-section">Visit Map</a></li>
               <li><a href="#guestbook">Guestbook</a></li>
             </ul>
           </div>
@@ -107,7 +115,9 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="js/instagram.js"></script>
 <script src="js/main.js"></script>
+<script src="js/map.js"></script>
 </body>
 </html>
