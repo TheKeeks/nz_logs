@@ -82,6 +82,24 @@ var CONFIG = {
     }
   }
 
+  function applyImageEnhancements(container, eagerCount) {
+    var imgs = container.querySelectorAll(".post-image img");
+    imgs.forEach(function (img, i) {
+      var figure = img.closest(".post-image");
+      img.setAttribute("loading", i < eagerCount ? "eager" : "lazy");
+      if (!img.complete) {
+        figure.classList.add("img-loading");
+        img.addEventListener("load", function () {
+          figure.classList.remove("img-loading");
+        }, { once: true });
+        img.addEventListener("error", function () {
+          figure.classList.remove("img-loading");
+          figure.classList.add("img-error");
+        }, { once: true });
+      }
+    });
+  }
+
   function renderPosts(posts) {
     var container = document.getElementById("posts-container");
     if (!container) return;
@@ -122,6 +140,9 @@ var CONFIG = {
     });
 
     container.innerHTML = html;
+
+    // Apply lazy loading, shimmer, and error handling to all post images
+    applyImageEnhancements(container, 2);
 
     // Lightbox delegation — bound to container since innerHTML is replaced on each render
     container.addEventListener("click", function (e) {

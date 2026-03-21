@@ -197,7 +197,7 @@
 
   /* ---- Bootstrap ---- */
 
-  document.addEventListener("DOMContentLoaded", function () {
+  function bootstrap() {
     fetch("posts.json?t=" + Date.now())
       .then(function (r) {
         return r.json();
@@ -208,5 +208,12 @@
       .catch(function (err) {
         console.error("Map: could not load posts", err);
       });
-  });
+  }
+
+  // Support both synchronous and deferred (dynamic) script loading
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootstrap);
+  } else {
+    bootstrap();
+  }
 })();

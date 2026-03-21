@@ -5,7 +5,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>NZ Logs</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"></noscript>
   <script async src="//www.instagram.com/embed.js"></script>
 </head>
 <body>
@@ -116,9 +117,31 @@
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="js/instagram.js"></script>
 <script src="js/main.js"></script>
-<script src="js/map.js"></script>
+<script>
+  // Load Leaflet + map.js only when the map section nears the viewport
+  (function () {
+    function loadMap() {
+      var s = document.createElement("script");
+      s.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      s.onload = function () {
+        var m = document.createElement("script");
+        m.src = "js/map.js";
+        document.body.appendChild(m);
+      };
+      document.body.appendChild(s);
+    }
+    var mapSection = document.getElementById("map-section");
+    if (!mapSection || !("IntersectionObserver" in window)) {
+      loadMap();
+      return;
+    }
+    var obs = new IntersectionObserver(function (entries, o) {
+      if (entries[0].isIntersecting) { o.disconnect(); loadMap(); }
+    }, { rootMargin: "200px" });
+    obs.observe(mapSection);
+  })();
+</script>
 </body>
 </html>

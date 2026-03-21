@@ -454,6 +454,67 @@ a:active { color: #FF0000; }
 }
 
 /* ============================================
+   Image lazy loading — shimmer, fade-in, error
+   ============================================ */
+
+.post-image {
+  position: relative;
+}
+
+.post-image.img-loading::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 24px;
+  background: linear-gradient(90deg, #d4d0c8 0%, #e8e8e8 40%, #d4d0c8 60%, #d4d0c8 100%);
+  background-size: 200% 100%;
+  animation: win98-shimmer 1.4s infinite linear;
+  z-index: 1;
+}
+
+@keyframes win98-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.post-image.img-loading img {
+  opacity: 0;
+}
+
+.post-image img {
+  transition: opacity 0.25s ease-in;
+}
+
+.post-image.img-error::before {
+  content: "[ image failed to load ]";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 24px;
+  background-color: #f0f0f0;
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  font-size: 11px;
+  color: #808080;
+  font-style: italic;
+  z-index: 1;
+}
+
+.post-image.img-error img {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ============================================
    Lightbox (Win98 dialog style)
    ============================================ */
 
