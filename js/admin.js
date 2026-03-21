@@ -99,41 +99,77 @@ function clearToken() {
       .getElementById("image-file-input")
       .addEventListener("change", handleImageFileSelected);
 
-    // Paste images directly into the body textarea (desktop and mobile)
+    // Paste text+images from notes apps, screenshots, etc.
     document.getElementById("post-body").addEventListener("paste", function (e) {
-      var file = null;
+      var imageFiles = [];
 
-      // Try clipboardData.items first (desktop Chrome/Firefox, iOS Safari 13.4+)
+      // Collect ALL image files from clipboard items
       var items = e.clipboardData && e.clipboardData.items;
       if (items) {
         for (var i = 0; i < items.length; i++) {
           if (items[i].type.startsWith("image/")) {
-            file = items[i].getAsFile();
-            break;
+            var f = items[i].getAsFile();
+            if (f) imageFiles.push(f);
           }
         }
       }
 
       // Fallback to clipboardData.files (some Android browsers)
-      if (!file) {
+      if (imageFiles.length === 0) {
         var files = e.clipboardData && e.clipboardData.files;
-        if (files && files.length > 0 && files[0].type.startsWith("image/")) {
-          file = files[0];
+        if (files) {
+          for (var j = 0; j < files.length; j++) {
+            if (files[j].type.startsWith("image/")) {
+              imageFiles.push(files[j]);
+            }
+          }
         }
       }
 
-      if (!file) return;
+      // No images — let the browser handle the plain text paste normally
+      if (imageFiles.length === 0) return;
 
       e.preventDefault();
-      showStatus("Uploading pasted image...", "info");
-      uploadImageToGitHub(file)
-        .then(function (imagePath) {
-          insertImageHtmlAtCursor(imagePath, "");
-          showStatus("Image uploaded and inserted!", "success");
-        })
-        .catch(function (err) {
-          showStatus("Image upload failed: " + err.message, "error");
-        });
+
+      // Grab any text that was pasted alongside the images
+      var pastedText = (e.clipboardData && e.clipboardData.getData("text/plain")) || "";
+
+      var textarea = document.getElementById("post-body");
+      var start = textarea.selectionStart;
+      var end = textarea.selectionEnd;
+      var before = textarea.value.substring(0, start);
+      var after = textarea.value.substring(end);
+
+      // Insert the pasted text first, then images will be appended after it
+      if (pastedText) {
+        textarea.value = before + pastedText + after;
+        textarea.selectionStart = textarea.selectionEnd = start + pastedText.length;
+      }
+
+      // Upload all images and insert each one
+      var imageCount = imageFiles.length;
+      var uploadedCount = 0;
+      var failedCount = 0;
+      showStatus("Uploading " + imageCount + " image(s)...", "info");
+
+      imageFiles.forEach(function (file) {
+        uploadImageToGitHub(file)
+          .then(function (imagePath) {
+            insertImageHtmlAtCursor(imagePath, "");
+            uploadedCount++;
+            if (uploadedCount + failedCount === imageCount) {
+              var msg = uploadedCount + " image(s) uploaded";
+              if (failedCount > 0) msg += ", " + failedCount + " failed";
+              showStatus(msg, failedCount > 0 ? "error" : "success");
+            }
+          })
+          .catch(function (err) {
+            failedCount++;
+            if (uploadedCount + failedCount === imageCount) {
+              showStatus(uploadedCount + " uploaded, " + failedCount + " failed: " + err.message, "error");
+            }
+          });
+      });
     });
 
     // Load current marquee text and posts list
