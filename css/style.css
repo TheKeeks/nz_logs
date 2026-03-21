@@ -224,6 +224,33 @@ a:active { color: #FF0000; }
   margin: 12px 0;
 }
 
+/* Post collapse / expand (accordion) */
+
+.post-header {
+  cursor: pointer;
+  padding: 4px;
+  user-select: none;
+}
+
+.post-header:hover {
+  background-color: #d4d0c8;
+}
+
+.post-toggle {
+  font-family: monospace;
+  font-weight: bold;
+  margin-right: 4px;
+  font-size: 12px;
+}
+
+.post.collapsed .post-body {
+  display: none;
+}
+
+.post.collapsed hr {
+  display: none;
+}
+
 /* Instagram embeds in posts */
 .post .instagram-embed {
   margin: 8px 0;
