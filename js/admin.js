@@ -109,7 +109,7 @@ function clearToken() {
         for (var i = 0; i < items.length; i++) {
           if (items[i].type.startsWith("image/")) {
             var f = items[i].getAsFile();
-            if (f) imageFiles.push(f);
+            if (f && f.size > 0) imageFiles.push(f);
           }
         }
       }
@@ -119,10 +119,30 @@ function clearToken() {
         var files = e.clipboardData && e.clipboardData.files;
         if (files) {
           for (var j = 0; j < files.length; j++) {
-            if (files[j].type.startsWith("image/")) {
+            if (files[j].type.startsWith("image/") && files[j].size > 0) {
               imageFiles.push(files[j]);
             }
           }
+        }
+      }
+
+      // Second fallback: extract data URI images from text/html (iOS Notes embeds images this way)
+      if (imageFiles.length === 0) {
+        var pastedHtml = e.clipboardData && e.clipboardData.getData("text/html");
+        if (pastedHtml) {
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(pastedHtml, "text/html");
+          var imgs = doc.querySelectorAll("img[src^='data:image/']");
+          imgs.forEach(function (img) {
+            var mimeMatch = img.src.match(/^data:(image\/[^;]+);base64,(.+)$/);
+            if (!mimeMatch) return;
+            var mime = mimeMatch[1];
+            var binary = atob(mimeMatch[2]);
+            var bytes = new Uint8Array(binary.length);
+            for (var k = 0; k < binary.length; k++) bytes[k] = binary.charCodeAt(k);
+            var blob = new Blob([bytes], { type: mime });
+            if (blob.size > 0) imageFiles.push(new File([blob], "image.png", { type: mime }));
+          });
         }
       }
 
@@ -146,29 +166,30 @@ function clearToken() {
         textarea.selectionStart = textarea.selectionEnd = start + pastedText.length;
       }
 
-      // Upload all images and insert each one
+      // Upload images sequentially to avoid GitHub API secondary rate limits
       var imageCount = imageFiles.length;
       var uploadedCount = 0;
       var failedCount = 0;
-      showStatus("Uploading " + imageCount + " image(s)...", "info");
 
-      imageFiles.forEach(function (file) {
-        uploadImageToGitHub(file)
-          .then(function (imagePath) {
-            insertImageHtmlAtCursor(imagePath, "");
-            uploadedCount++;
-            if (uploadedCount + failedCount === imageCount) {
-              var msg = uploadedCount + " image(s) uploaded";
-              if (failedCount > 0) msg += ", " + failedCount + " failed";
-              showStatus(msg, failedCount > 0 ? "error" : "success");
-            }
-          })
-          .catch(function (err) {
-            failedCount++;
-            if (uploadedCount + failedCount === imageCount) {
-              showStatus(uploadedCount + " uploaded, " + failedCount + " failed: " + err.message, "error");
-            }
-          });
+      var chain = Promise.resolve();
+      imageFiles.forEach(function (file, idx) {
+        chain = chain.then(function () {
+          showStatus("Uploading image " + (idx + 1) + " of " + imageCount + "...", "info");
+          return uploadImageToGitHub(file)
+            .then(function (imagePath) {
+              insertImageHtmlAtCursor(imagePath, "");
+              uploadedCount++;
+            })
+            .catch(function (err) {
+              failedCount++;
+              console.warn("Image upload failed:", err.message);
+            });
+        });
+      });
+      chain.then(function () {
+        var msg = uploadedCount + " image(s) uploaded";
+        if (failedCount > 0) msg += ", " + failedCount + " failed";
+        showStatus(msg, failedCount > 0 ? "error" : "success");
       });
     });
 
