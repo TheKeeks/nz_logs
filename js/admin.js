@@ -99,6 +99,34 @@ function clearToken() {
       .getElementById("image-file-input")
       .addEventListener("change", handleImageFileSelected);
 
+    // Paste images directly into the body textarea
+    document.getElementById("post-body").addEventListener("paste", function (e) {
+      var items = e.clipboardData && e.clipboardData.items;
+      if (!items) return;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith("image/")) {
+          e.preventDefault();
+          var file = items[i].getAsFile();
+          showStatus("Uploading pasted image...", "info");
+          uploadImageToGitHub(file)
+            .then(function (imagePath) {
+              var textarea = document.getElementById("post-body");
+              var imgHtml = '<img src="' + imagePath + '">';
+              var start = textarea.selectionStart;
+              var text = textarea.value;
+              textarea.value = text.substring(0, start) + imgHtml + text.substring(start);
+              textarea.selectionStart = textarea.selectionEnd = start + imgHtml.length;
+              textarea.focus();
+              showStatus("Image uploaded and inserted!", "success");
+            })
+            .catch(function (err) {
+              showStatus("Image upload failed: " + err.message, "error");
+            });
+          break;
+        }
+      }
+    });
+
     // Load current marquee text and posts list
     loadCurrentMarquee();
     loadPostsList();
