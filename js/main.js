@@ -54,6 +54,7 @@ var CONFIG = {
         renderMarquee(data.marquee);
         renderPosts(data.posts || []);
         updateLastUpdated(data.posts || []);
+        renderEntriesNav(data.posts || []);
       })
       .catch(function (err) {
         console.error(err);
@@ -186,6 +187,69 @@ var CONFIG = {
     if (overlay) overlay.classList.remove("active");
     var img = document.getElementById("lightbox-img");
     if (img) img.src = "";
+  }
+
+  function renderEntriesNav(posts) {
+    var list = document.getElementById("entries-list");
+    if (!list) return;
+
+    var published = posts.filter(function (p) { return p.published; });
+    if (published.length === 0) {
+      list.innerHTML = "<li><i>No entries yet</i></li>";
+      return;
+    }
+
+    var html = "";
+    published.forEach(function (post) {
+      var label = "";
+      if (post.date) {
+        var d = new Date(post.date + "T00:00:00");
+        var month = d.toLocaleDateString("en-US", { month: "short" });
+        var day = d.getDate();
+        label = month + " " + day + " - ";
+      }
+      label += post.title;
+      html += '<li><a href="#post-' + post.id + '" data-post-id="' + post.id + '">' + escapeHtml(label) + "</a></li>";
+    });
+    list.innerHTML = html;
+
+    initSmoothScroll(list);
+    initScrollSpy(published);
+  }
+
+  function initSmoothScroll(list) {
+    list.addEventListener("click", function (e) {
+      var link = e.target.closest("a");
+      if (!link) return;
+      var target = document.getElementById("post-" + link.getAttribute("data-post-id"));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+
+  function initScrollSpy(posts) {
+    var links = document.querySelectorAll("#entries-list a");
+    if (!links.length) return;
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var id = entry.target.id.replace("post-", "");
+        var link = document.querySelector('#entries-list a[data-post-id="' + id + '"]');
+        if (!link) return;
+        if (entry.isIntersecting) {
+          // Remove active from all links
+          links.forEach(function (l) { l.classList.remove("active"); });
+          link.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-10% 0px -80% 0px" });
+
+    posts.forEach(function (post) {
+      var el = document.getElementById("post-" + post.id);
+      if (el) observer.observe(el);
+    });
   }
 
   function escapeHtml(str) {

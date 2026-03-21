@@ -33,80 +33,85 @@
       <div id="visit-map"></div>
     </div>
 
-    <!-- Main Layout Table -->
-    <table class="layout-table">
-      <tr>
-        <!-- Left Sidebar -->
-        <td class="sidebar">
+    <!-- Main Layout -->
+    <div class="layout-flex">
+      <!-- Left Sidebar -->
+      <div class="sidebar">
 
+        <div class="sidebar-box">
+          <h3>About This Site</h3>
+          <p>A travel log following our adventure through New Zealand. Updated from the road!</p>
+        </div>
+
+        <div class="sidebar-box">
+          <h3>Navigation</h3>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#map-section">Visit Map</a></li>
+            <li><a href="#guestbook">Guestbook</a></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-box" id="entries-nav">
+          <h3>Entries</h3>
+          <ul id="entries-list">
+            <li><i>Loading...</i></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-box">
+          <h3>Hit Counter</h3>
+          <div class="hit-counter">
+            <p>You are visitor #<span id="my-visitor-number">...</span></p>
+            <p>Total visits: <span id="visitor-count">...</span></p>
+          </div>
+        </div>
+
+        <div class="sidebar-box instagram-sidebar">
+          <h3>Instagram</h3>
+          <iframe src="https://www.instagram.com/nz_logs/embed" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+        </div>
+
+        <div class="sidebar-box">
+          <h3>Links</h3>
+          <ul>
+            <li><a href="https://www.newzealand.com" target="_blank">NZ Tourism</a></li>
+            <li><a href="https://www.doc.govt.nz" target="_blank">DOC NZ</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div id="posts-container">
+          <p class="no-posts">Loading posts...</p>
+        </div>
+
+        <!-- Guestbook -->
+        <div class="guestbook-section" id="guestbook">
+          <h2>Sign My Guestbook!</h2>
           <div class="sidebar-box">
-            <h3>About This Site</h3>
-            <p>A travel log following our adventure through New Zealand. Updated from the road!</p>
+            <p><i>Leave a message below using your GitHub account. Powered by Giscus &amp; GitHub Discussions.</i></p>
+            <script src="https://giscus.app/client.js"
+              data-repo="thekeeks/nz_Logs"
+              data-repo-id="R_kgDORknkzQ"
+              data-category="Announcements"
+              data-category-id="DIC_kwDORknkzc4C4MEC"
+              data-mapping="pathname"
+              data-strict="0"
+              data-reactions-enabled="1"
+              data-emit-metadata="0"
+              data-input-position="bottom"
+              data-theme="https://thekeeks.github.io/nz_logs/css/giscus-win98.css"
+              data-lang="en"
+              crossorigin="anonymous"
+              async>
+            </script>
           </div>
-
-          <div class="sidebar-box">
-            <h3>Navigation</h3>
-            <ul>
-              <li><a href="index.html">Home</a></li>
-              <li><a href="#map-section">Visit Map</a></li>
-              <li><a href="#guestbook">Guestbook</a></li>
-            </ul>
-          </div>
-
-          <div class="sidebar-box">
-            <h3>Hit Counter</h3>
-            <div class="hit-counter">
-              <p>You are visitor #<span id="my-visitor-number">...</span></p>
-              <p>Total visits: <span id="visitor-count">...</span></p>
-            </div>
-          </div>
-
-          <div class="sidebar-box instagram-sidebar">
-            <h3>Instagram</h3>
-            <iframe src="https://www.instagram.com/nz_logs/embed" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
-          </div>
-
-          <div class="sidebar-box">
-            <h3>Links</h3>
-            <ul>
-              <li><a href="https://www.newzealand.com" target="_blank">NZ Tourism</a></li>
-              <li><a href="https://www.doc.govt.nz" target="_blank">DOC NZ</a></li>
-            </ul>
-          </div>
-
-        </td>
-
-        <!-- Main Content -->
-        <td class="main-content">
-          <div id="posts-container">
-            <p class="no-posts">Loading posts...</p>
-          </div>
-
-          <!-- Guestbook -->
-          <div class="guestbook-section" id="guestbook">
-            <h2>Sign My Guestbook!</h2>
-            <div class="sidebar-box">
-              <p><i>Leave a message below using your GitHub account. Powered by Giscus &amp; GitHub Discussions.</i></p>
-              <script src="https://giscus.app/client.js"
-                data-repo="thekeeks/nz_Logs"
-                data-repo-id="R_kgDORknkzQ"
-                data-category="Announcements"
-                data-category-id="DIC_kwDORknkzc4C4MEC"
-                data-mapping="pathname"
-                data-strict="0"
-                data-reactions-enabled="1"
-                data-emit-metadata="0"
-                data-input-position="bottom"
-                data-theme="https://thekeeks.github.io/nz_logs/css/giscus-win98.css"
-                data-lang="en"
-                crossorigin="anonymous"
-                async>
-              </script>
-            </div>
-          </div>
-        </td>
-      </tr>
-    </table>
+        </div>
+      </div>
+    </div>
 
     <!-- Footer -->
     <div class="site-footer">
