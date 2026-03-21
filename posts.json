@@ -2,6 +2,14 @@
   "marquee": "*** Welcome to our New Zealand travel log! *** Kia ora! *** -- Keeks & Elsie",
   "posts": [
     {
+      "id": "2026-03-16-monday-3-16-arrived-",
+      "date": "2026-03-16",
+      "title": "Monday 3/16 - Arrived!",
+      "location": "Christchurch, NZ",
+      "body": "<figure class=\"post-image\"><img src=\"images/1774055508631_image.png\" alt=\"Image\"><figcaption><strong></strong></figcaption></figure><br><br>Long travel day included an 18 hour flight from JFK > AKL, one failed approach into Christchurch due to fog, doubled back to Auckland, and one successful landing. Met a surfer flying through to Brisbane who was an engineer on Qantas now spending his pension flight miles. <br><br>Picked up the van, loaded up on groceries, and picked up Elsie’s board, which she had custom made by a local dude. Drove through and out of Christchurch, which was aglow with a blanket of warm Indian Summer. Leaves had started to change but it was 70 and sunny. Slept at beach parking lot a few hours south of Christchurch.",
+      "published": true
+    },
+    {
       "id": "2026-03-12-blizzard-board-whiplash-syndrome",
       "date": "2026-03-12",
       "title": "Blizzard Board & Whiplash Syndrome",
