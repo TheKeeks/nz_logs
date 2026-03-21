@@ -286,7 +286,7 @@ function clearToken() {
       reader.onload = function (e) {
         var base64 = e.target.result.split(",")[1]; // strip data URI prefix
         var timestamp = Date.now();
-        var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").toLowerCase();
+        var safeName = (file.name || "image").replace(/[^a-zA-Z0-9._-]/g, "_").toLowerCase();
         var filename = timestamp + "_" + safeName;
         var url =
           "https://api.github.com/repos/" +
