@@ -99,32 +99,41 @@ function clearToken() {
       .getElementById("image-file-input")
       .addEventListener("change", handleImageFileSelected);
 
-    // Paste images directly into the body textarea
+    // Paste images directly into the body textarea (desktop and mobile)
     document.getElementById("post-body").addEventListener("paste", function (e) {
+      var file = null;
+
+      // Try clipboardData.items first (desktop Chrome/Firefox, iOS Safari 13.4+)
       var items = e.clipboardData && e.clipboardData.items;
-      if (!items) return;
-      for (var i = 0; i < items.length; i++) {
-        if (items[i].type.startsWith("image/")) {
-          e.preventDefault();
-          var file = items[i].getAsFile();
-          showStatus("Uploading pasted image...", "info");
-          uploadImageToGitHub(file)
-            .then(function (imagePath) {
-              var textarea = document.getElementById("post-body");
-              var imgHtml = '<img src="' + imagePath + '">';
-              var start = textarea.selectionStart;
-              var text = textarea.value;
-              textarea.value = text.substring(0, start) + imgHtml + text.substring(start);
-              textarea.selectionStart = textarea.selectionEnd = start + imgHtml.length;
-              textarea.focus();
-              showStatus("Image uploaded and inserted!", "success");
-            })
-            .catch(function (err) {
-              showStatus("Image upload failed: " + err.message, "error");
-            });
-          break;
+      if (items) {
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].type.startsWith("image/")) {
+            file = items[i].getAsFile();
+            break;
+          }
         }
       }
+
+      // Fallback to clipboardData.files (some Android browsers)
+      if (!file) {
+        var files = e.clipboardData && e.clipboardData.files;
+        if (files && files.length > 0 && files[0].type.startsWith("image/")) {
+          file = files[0];
+        }
+      }
+
+      if (!file) return;
+
+      e.preventDefault();
+      showStatus("Uploading pasted image...", "info");
+      uploadImageToGitHub(file)
+        .then(function (imagePath) {
+          insertImageHtmlAtCursor(imagePath, "");
+          showStatus("Image uploaded and inserted!", "success");
+        })
+        .catch(function (err) {
+          showStatus("Image upload failed: " + err.message, "error");
+        });
     });
 
     // Load current marquee text and posts list
@@ -286,7 +295,8 @@ function clearToken() {
       reader.onload = function (e) {
         var base64 = e.target.result.split(",")[1]; // strip data URI prefix
         var timestamp = Date.now();
-        var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").toLowerCase();
+        var rawName = (file.name && file.name !== "undefined") ? file.name : "image.png";
+        var safeName = rawName.replace(/[^a-zA-Z0-9._-]/g, "_").toLowerCase();
         var filename = timestamp + "_" + safeName;
         var url =
           "https://api.github.com/repos/" +
