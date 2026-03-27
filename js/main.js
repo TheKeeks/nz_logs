@@ -14,7 +14,11 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
 (function () {
   document.addEventListener("DOMContentLoaded", function () {
     initLightbox();
-    loadPosts();
+    if (isSigned()) {
+      loadPosts();
+    } else {
+      showGate();
+    }
     loadVisitorCount();
     loadGuestbook();
     initGuestbook();
@@ -48,6 +52,35 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
           myEl.textContent = stored || "?";
         }
       });
+  }
+
+  function isSigned() {
+    return !!localStorage.getItem("nz_logs_signed");
+  }
+
+  function markSigned() {
+    localStorage.setItem("nz_logs_signed", "1");
+    if (document.querySelector(".gate-overlay")) {
+      loadPosts();
+    }
+  }
+
+  function showGate() {
+    var container = document.getElementById("posts-container");
+    if (!container) return;
+    container.innerHTML =
+      '<div class="gate-overlay">' +
+        '<div class="gate-dialog">' +
+          '<div class="gate-titlebar">' +
+            '<img src="https://unpkg.com/pixelarticons/svg/lock.svg" class="pixel-icon pixel-icon-white" alt=""> ' +
+            'Sign In Required' +
+          '</div>' +
+          '<div class="gate-body">' +
+            '<p>Sign the guestbook below to access the travel log.</p>' +
+            '<a href="#guestbook" class="btn">Go to Guestbook</a>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
   }
 
   function loadPosts() {
@@ -442,7 +475,8 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
         return;
       }
       if (GUESTBOOK_EXCLUDED.indexOf(name.toLowerCase()) !== -1) {
-        showGuestStatus("Welcome home! \u2665", "info");
+        markSigned();
+        showGuestStatus("Welcome home!", "info");
         return;
       }
 
@@ -458,7 +492,8 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
           });
 
           if (duplicate) {
-            showGuestStatus("Already in the log! Come back anytime :)", "info");
+            markSigned();
+            showGuestStatus("Already in the log! Welcome back :)", "info");
             submitBtn.disabled = false;
             return;
           }
@@ -478,6 +513,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
             nameInput.value = "";
             var noteInput = document.getElementById("guest-note-input");
             if (noteInput) noteInput.value = "";
+            markSigned();
             showGuestStatus("You're in the log!", "success");
             renderGuestData(guests);
           });

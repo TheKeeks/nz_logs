@@ -12,24 +12,24 @@
   /* ---- Icon factories ---- */
 
   function makeSpecialIcon() {
-    // Star pin — used for locations that have a published blog post
+    // Pin — used for locations that have a published blog post
     return L.divIcon({
       className: "map-pin-special",
-      html: "&#9733;",
-      iconSize: [22, 22],
-      iconAnchor: [11, 11],
-      popupAnchor: [0, -13],
+      html: '<img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="map-pin-img map-pin-img-special" alt="">',
+      iconSize: [16, 16],
+      iconAnchor: [8, 16],
+      popupAnchor: [0, -17],
     });
   }
 
   function makePlainIcon() {
-    // Dot pin — for visited places with no post (future use)
+    // Pin — for visited places with no post (future use)
     return L.divIcon({
       className: "map-pin-plain",
-      html: "&#9679;",
-      iconSize: [14, 14],
-      iconAnchor: [7, 7],
-      popupAnchor: [0, -9],
+      html: '<img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="map-pin-img map-pin-img-plain" alt="">',
+      iconSize: [12, 12],
+      iconAnchor: [6, 12],
+      popupAnchor: [0, -13],
     });
   }
 

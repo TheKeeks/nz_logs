@@ -410,6 +410,41 @@ a:active { color: #FF0000; }
   border-right: 2px solid #ffffff;
 }
 
+/* Guestbook gate */
+.gate-overlay {
+  padding: 40px 10px;
+  text-align: center;
+}
+
+.gate-dialog {
+  display: inline-block;
+  background-color: #c0c0c0;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  border-right: 2px solid #808080;
+  min-width: 220px;
+  max-width: 100%;
+  text-align: left;
+}
+
+.gate-titlebar {
+  background: linear-gradient(to right, #000080, #1084d0);
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 3px 6px;
+}
+
+.gate-body {
+  padding: 16px;
+}
+
+.gate-body p {
+  margin: 0 0 10px 0;
+  font-size: 12px;
+}
+
 /* Empty state */
 .no-posts {
   text-align: center;
@@ -445,24 +480,28 @@ a:active { color: #FF0000; }
   display: block;
 }
 
-/* Star pin */
-.map-pin-special {
-  font-size: 18px;
-  line-height: 22px;
-  text-align: center;
-  color: #cc8800;
-  text-shadow: 0 0 2px #000000;
+/* Pixel art map pins */
+.map-pin-special,
+.map-pin-plain {
   cursor: pointer;
 }
 
-/* Dot pin */
-.map-pin-plain {
-  font-size: 13px;
-  line-height: 14px;
-  text-align: center;
-  color: #000080;
-  text-shadow: 0 0 1px #ffffff;
-  cursor: pointer;
+.map-pin-img {
+  display: block;
+}
+
+.map-pin-img-special {
+  width: 16px;
+  height: 16px;
+  /* gold: #cc8800 */
+  filter: brightness(0) saturate(100%) invert(45%) sepia(90%) saturate(600%) hue-rotate(10deg) brightness(95%);
+}
+
+.map-pin-img-plain {
+  width: 12px;
+  height: 12px;
+  /* navy: #000080 */
+  filter: brightness(0) saturate(100%) invert(8%) sepia(100%) saturate(5000%) hue-rotate(240deg) brightness(70%);
 }
 
 /* Leaflet popup — Win98 style */
