@@ -30,7 +30,7 @@
 
     <!-- Visit Map -->
     <div class="map-section" id="map-section">
-      <div class="map-section-title">&#128205; Where We've Been</div>
+      <div class="map-section-title"><img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="pixel-icon pixel-icon-white" alt=""> Where We've Been</div>
       <div id="visit-map"></div>
     </div>
 
@@ -56,6 +56,13 @@
         <div class="sidebar-box" id="entries-nav">
           <h3>Entries</h3>
           <ul id="entries-list">
+            <li><i>Loading...</i></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-box" id="guests-box">
+          <h3>Guests</h3>
+          <ul id="guests-list">
             <li><i>Loading...</i></li>
           </ul>
         </div>
@@ -91,24 +98,36 @@
 
         <!-- Guestbook -->
         <div class="guestbook-section" id="guestbook">
-          <h2>Sign My Guestbook!</h2>
-          <div class="sidebar-box">
-            <p><i>Leave a message below using your GitHub account. Powered by Giscus &amp; GitHub Discussions.</i></p>
-            <script src="https://giscus.app/client.js"
-              data-repo="thekeeks/nz_Logs"
-              data-repo-id="R_kgDORknkzQ"
-              data-category="Announcements"
-              data-category-id="DIC_kwDORknkzc4C4MEC"
-              data-mapping="pathname"
-              data-strict="0"
-              data-reactions-enabled="1"
-              data-emit-metadata="0"
-              data-input-position="bottom"
-              data-theme="https://thekeeks.github.io/nz_logs/css/giscus-win98.css"
-              data-lang="en"
-              crossorigin="anonymous"
-              async>
-            </script>
+          <h2>Sign the Guestbook!</h2>
+          <div class="guestbook-columns">
+            <!-- Left: form + name list -->
+            <div class="guestbook-left">
+              <div class="sidebar-box">
+                <p><i>Drop your name — no account needed!</i></p>
+                <p><i>Visiting again? No worries — your name only shows up once.</i></p>
+                <div class="guestbook-form">
+                  <input type="text" id="guest-name-input" class="guestbook-input" placeholder="Your name" maxlength="50">
+                  <textarea id="guest-note-input" class="guestbook-textarea" placeholder="Leave a note (optional)" maxlength="200" rows="2"></textarea>
+                  <button id="guest-submit-btn" class="btn">Sign In</button>
+                </div>
+                <div id="guestbook-status"></div>
+              </div>
+              <div class="sidebar-box">
+                <h3>Visitors</h3>
+                <ul id="guests-list-main">
+                  <li><i>Loading...</i></li>
+                </ul>
+              </div>
+            </div>
+            <!-- Right: notes -->
+            <div class="guestbook-right">
+              <div class="sidebar-box">
+                <h3>Guestbook Notes</h3>
+                <div id="guestbook-notes">
+                  <p><i>Loading...</i></p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
