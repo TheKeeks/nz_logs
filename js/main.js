@@ -7,11 +7,17 @@ var CONFIG = {
   postsFile: "posts.json",
 };
 
+var JSONBIN_BIN_ID = "69c6330db7ec241ddcaae9f9";
+var JSONBIN_KEY = "$2a$10$lzm5XzmGnTkKtV4sx.hEtO3Ir2o87zWSQcpFr9NlfzBTVsa3Q.ijG";
+var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
+
 (function () {
   document.addEventListener("DOMContentLoaded", function () {
     initLightbox();
     loadPosts();
     loadVisitorCount();
+    loadGuestbook();
+    initGuestbook();
   });
 
   function loadVisitorCount() {
@@ -187,12 +193,13 @@ var CONFIG = {
 
       // Clickable header with toggle
       html += '<div class="post-header">';
+      html += '<button class="post-font-toggle btn" title="Toggle font size" aria-label="Toggle font size">A+</button>';
       html += '<span class="post-toggle">' + (collapsed ? "[+]" : "[-]") + "</span>";
       if (dateStr) {
-        html += '<span class="post-date">\ud83d\udcc5 ' + dateStr + "</span> ";
+        html += '<span class="post-date"><img src="https://unpkg.com/pixelarticons/svg/calendar.svg" class="pixel-icon" alt=""> ' + dateStr + "</span> ";
       }
       if (post.location) {
-        html += '<span class="post-location">\ud83d\udccd ' + escapeHtml(post.location) + "</span> ";
+        html += '<span class="post-location"><img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="pixel-icon" alt=""> ' + escapeHtml(post.location) + "</span> ";
       }
       html += "<h2>" + escapeHtml(post.title) + "</h2>";
       html += "</div>";
@@ -217,6 +224,13 @@ var CONFIG = {
 
     // Click delegation for post headers
     container.addEventListener("click", function (e) {
+      var fontBtn = e.target.closest(".post-font-toggle");
+      if (fontBtn) {
+        var postEl = fontBtn.closest(".post");
+        if (postEl) postEl.classList.toggle("font-large");
+        return;
+      }
+
       var header = e.target.closest(".post-header");
       if (header) {
         var postEl = header.closest(".post");
@@ -353,5 +367,132 @@ var CONFIG = {
     var div = document.createElement("div");
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
+  }
+
+  // ── Guestbook ──────────────────────────────────────────────────────────────
+
+  function loadGuestbook() {
+    fetch("https://api.jsonbin.io/v3/b/" + JSONBIN_BIN_ID + "/latest")
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        renderGuestData((data.record && data.record.guests) || []);
+      })
+      .catch(function () {
+        setGuestLoadError();
+      });
+  }
+
+  function renderGuestData(guests) {
+    // Sidebar guest list
+    var sidebarList = document.getElementById("guests-list");
+    // Main guestbook name list
+    var mainList = document.getElementById("guests-list-main");
+    // Notes panel
+    var notesPanel = document.getElementById("guestbook-notes");
+
+    if (!guests.length) {
+      var emptyNames = "<li><i>No visitors yet!</i></li>";
+      if (sidebarList) sidebarList.innerHTML = emptyNames;
+      if (mainList) mainList.innerHTML = emptyNames;
+      if (notesPanel) notesPanel.innerHTML = "<p><i>No notes yet — be the first!</i></p>";
+      return;
+    }
+
+    var namesHtml = "";
+    var notesHtml = "";
+    var hasNotes = false;
+
+    guests.forEach(function (guest) {
+      namesHtml += "<li>" + escapeHtml(guest.name) + "</li>";
+      if (guest.note && guest.note.trim()) {
+        hasNotes = true;
+        notesHtml += '<div class="guest-note"><strong>' + escapeHtml(guest.name) + "</strong><p>" + escapeHtml(guest.note.trim()) + "</p></div>";
+      }
+    });
+
+    if (sidebarList) sidebarList.innerHTML = namesHtml;
+    if (mainList) mainList.innerHTML = namesHtml;
+    if (notesPanel) notesPanel.innerHTML = hasNotes ? notesHtml : "<p><i>No notes yet — be the first!</i></p>";
+  }
+
+  function setGuestLoadError() {
+    var msg = "<li><i>Unavailable</i></li>";
+    var sidebarList = document.getElementById("guests-list");
+    var mainList = document.getElementById("guests-list-main");
+    var notesPanel = document.getElementById("guestbook-notes");
+    if (sidebarList) sidebarList.innerHTML = msg;
+    if (mainList) mainList.innerHTML = msg;
+    if (notesPanel) notesPanel.innerHTML = "<p><i>Could not load notes.</i></p>";
+  }
+
+  function showGuestStatus(msg, type) {
+    var el = document.getElementById("guestbook-status");
+    if (el) el.innerHTML = '<div class="status-msg ' + type + '">' + escapeHtml(msg) + "</div>";
+  }
+
+  function initGuestbook() {
+    var nameInput = document.getElementById("guest-name-input");
+    var submitBtn = document.getElementById("guest-submit-btn");
+    if (!nameInput || !submitBtn) return;
+
+    function handleSubmit() {
+      var name = nameInput.value.trim();
+      if (!name) {
+        showGuestStatus("Please enter your name.", "error");
+        return;
+      }
+      if (GUESTBOOK_EXCLUDED.indexOf(name.toLowerCase()) !== -1) {
+        showGuestStatus("Welcome home! \u2665", "info");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      showGuestStatus("Signing in\u2026", "info");
+
+      fetch("https://api.jsonbin.io/v3/b/" + JSONBIN_BIN_ID + "/latest")
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          var guests = (data.record && data.record.guests) || [];
+          var duplicate = guests.some(function (g) {
+            return g.name.toLowerCase() === name.toLowerCase();
+          });
+
+          if (duplicate) {
+            showGuestStatus("Already in the log! Come back anytime :)", "info");
+            submitBtn.disabled = false;
+            return;
+          }
+
+          var note = (document.getElementById("guest-note-input") || {}).value || "";
+          note = note.trim();
+          guests.push({ name: name, note: note });
+
+          return fetch("https://api.jsonbin.io/v3/b/" + JSONBIN_BIN_ID, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Master-Key": JSONBIN_KEY,
+            },
+            body: JSON.stringify({ guests: guests }),
+          }).then(function () {
+            nameInput.value = "";
+            var noteInput = document.getElementById("guest-note-input");
+            if (noteInput) noteInput.value = "";
+            showGuestStatus("You're in the log!", "success");
+            renderGuestData(guests);
+          });
+        })
+        .catch(function () {
+          showGuestStatus("Something went wrong. Try again!", "error");
+        })
+        .finally(function () {
+          submitBtn.disabled = false;
+        });
+    }
+
+    submitBtn.addEventListener("click", handleSubmit);
+    nameInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") handleSubmit();
+    });
   }
 })();

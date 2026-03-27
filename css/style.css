@@ -273,6 +273,113 @@ a:active { color: #FF0000; }
   margin: 4px 0 8px 0;
 }
 
+/* Guestbook two-column layout */
+.guestbook-columns {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.guestbook-left,
+.guestbook-right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Guestbook form */
+.guestbook-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0 4px 0;
+}
+
+.guestbook-input,
+.guestbook-textarea {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  background-color: #ffffff;
+  padding: 2px 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.guestbook-textarea {
+  resize: vertical;
+  height: 48px;
+}
+
+/* Guest note cards */
+.guest-note {
+  border-bottom: 1px dotted #c0c0c0;
+  padding: 4px 0;
+  font-size: 11px;
+}
+
+.guest-note:last-child {
+  border-bottom: none;
+}
+
+.guest-note strong {
+  font-size: 12px;
+}
+
+.guest-note p {
+  margin: 2px 0 0 0;
+  color: #333333;
+}
+
+/* Sidebar guests list */
+#guests-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 4px 0;
+}
+
+#guests-list li {
+  font-size: 11px;
+  padding: 1px 4px;
+  margin-bottom: 1px;
+}
+
+#guests-list-main {
+  list-style: square;
+  padding-left: 18px;
+  margin: 4px 0;
+  font-size: 12px;
+}
+
+/* Font size toggle button */
+.post-font-toggle {
+  font-size: 10px;
+  padding: 1px 4px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Large font state */
+.post.font-large .post-body {
+  font-size: 15px;
+}
+
+/* Pixel art icons */
+.pixel-icon {
+  width: 12px;
+  height: 12px;
+  vertical-align: middle;
+  margin-right: 2px;
+  display: inline-block;
+}
+
+/* White version for dark title bars */
+.pixel-icon-white {
+  filter: invert(1) brightness(2);
+}
+
 /* Footer */
 .site-footer {
   text-align: center;
