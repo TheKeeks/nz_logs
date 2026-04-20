@@ -226,13 +226,12 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
 
       // Clickable header with toggle
       html += '<div class="post-header">';
-      html += '<button class="post-font-toggle btn" title="Toggle font size" aria-label="Toggle font size">A+</button>';
       html += '<span class="post-toggle">' + (collapsed ? "[+]" : "[-]") + "</span>";
       if (dateStr) {
-        html += '<span class="post-date"><img src="https://unpkg.com/pixelarticons/svg/calendar.svg" class="pixel-icon" alt=""> ' + dateStr + "</span> ";
+        html += '<span class="post-date"><img src="https://unpkg.com/pixelarticons/svg/calendar.svg" class="pixel-icon pixel-icon-gray" alt=""> ' + dateStr + "</span> ";
       }
       if (post.location) {
-        html += '<span class="post-location"><img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="pixel-icon" alt=""> ' + escapeHtml(post.location) + "</span> ";
+        html += '<span class="post-location"><img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="pixel-icon pixel-icon-green" alt=""> ' + escapeHtml(post.location) + "</span> ";
       }
       html += "<h2>" + escapeHtml(post.title) + "</h2>";
       html += "</div>";
@@ -257,13 +256,6 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
 
     // Click delegation for post headers
     container.addEventListener("click", function (e) {
-      var fontBtn = e.target.closest(".post-font-toggle");
-      if (fontBtn) {
-        var postEl = fontBtn.closest(".post");
-        if (postEl) postEl.classList.toggle("font-large");
-        return;
-      }
-
       var header = e.target.closest(".post-header");
       if (header) {
         var postEl = header.closest(".post");
@@ -402,7 +394,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     return div.innerHTML;
   }
 
-  // ── Guestbook ──────────────────────────────────────────────────────────────
+  // ── Guestbook ──────────────────────────────────────────────────────────────────────────────
 
   function loadGuestbook() {
     fetch("https://api.jsonbin.io/v3/b/" + JSONBIN_BIN_ID + "/latest")

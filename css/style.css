@@ -353,23 +353,10 @@ a:active { color: #FF0000; }
   font-size: 12px;
 }
 
-/* Font size toggle button */
-.post-font-toggle {
-  font-size: 10px;
-  padding: 1px 4px;
-  margin-right: 6px;
-  vertical-align: middle;
-}
-
-/* Large font state */
-.post.font-large .post-body {
-  font-size: 15px;
-}
-
 /* Pixel art icons */
 .pixel-icon {
-  width: 12px;
-  height: 12px;
+  width: 18px;
+  height: 18px;
   vertical-align: middle;
   margin-right: 2px;
   display: inline-block;
@@ -378,6 +365,16 @@ a:active { color: #FF0000; }
 /* White version for dark title bars */
 .pixel-icon-white {
   filter: invert(1) brightness(2);
+}
+
+/* Gray tint to match date/footer text (#666) */
+.pixel-icon-gray {
+  filter: invert(40%);
+}
+
+/* Green tint to match location text (#336633) */
+.pixel-icon-green {
+  filter: invert(28%) sepia(20%) saturate(2000%) hue-rotate(95deg) brightness(90%) contrast(85%);
 }
 
 /* Footer */
