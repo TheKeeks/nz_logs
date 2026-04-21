@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NZ Logs</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" media="print" onload="this.media='all'">
@@ -18,7 +19,6 @@
     <!-- Header -->
     <div class="site-header">
       <h1>NZ Logs</h1>
-      <p id="last-updated" class="last-updated">Last updated: --</p>
     </div>
 
     <!-- Marquee -->
@@ -28,109 +28,94 @@
       </marquee>
     </div>
 
-    <!-- Visit Map -->
-    <div class="map-section" id="map-section">
-      <div class="map-section-title"><img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="pixel-icon pixel-icon-white" alt=""> Where We've Been</div>
-      <div id="visit-map"></div>
-    </div>
+    <!-- Top Tab Nav -->
+    <nav class="tab-bar" role="tablist" aria-label="Main sections">
+      <button class="tab-btn active" data-tab="feed" role="tab" aria-selected="true" aria-controls="tab-feed">
+        <img src="https://unpkg.com/pixelarticons/svg/notes.svg" class="pixel-icon pixel-icon-white" alt=""> Feed
+      </button>
+      <button class="tab-btn" data-tab="info" role="tab" aria-selected="false" aria-controls="tab-info">
+        <img src="https://unpkg.com/pixelarticons/svg/info-box.svg" class="pixel-icon pixel-icon-white" alt=""> Info
+      </button>
+    </nav>
 
-    <!-- Main Layout -->
-    <div class="layout-flex">
-      <!-- Left Sidebar -->
-      <div class="sidebar">
+    <!-- Main Content -->
+    <div class="main-content">
 
-        <div class="sidebar-box">
+      <!-- Feed Tab -->
+      <section id="tab-feed" class="tab-panel" role="tabpanel" aria-labelledby="tab-feed-btn">
+
+        <!-- Visit Map -->
+        <div class="map-section" id="map-section">
+          <div class="map-section-title"><img src="https://unpkg.com/pixelarticons/svg/map.svg" class="pixel-icon pixel-icon-white" alt=""> Where We've Been</div>
+          <div id="visit-map"></div>
+        </div>
+
+        <!-- Card Feed -->
+        <div id="posts-container">
+          <p class="no-posts">Loading posts...</p>
+        </div>
+
+      </section>
+
+      <!-- Info Tab -->
+      <section id="tab-info" class="tab-panel" role="tabpanel" aria-labelledby="tab-info-btn" hidden>
+
+        <div class="info-box">
           <h3>About This Site</h3>
           <p>A travel log following our adventure through New Zealand. Updated from the road!</p>
+          <p id="last-updated" class="last-updated">Last updated: --</p>
         </div>
 
-        <div class="sidebar-box">
-          <h3>Navigation</h3>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="#map-section">Visit Map</a></li>
-            <li><a href="#guestbook">Guestbook</a></li>
-          </ul>
+        <!-- Guestbook -->
+        <div class="info-box" id="guestbook">
+          <h3><img src="https://unpkg.com/pixelarticons/svg/edit.svg" class="pixel-icon pixel-icon-gray" alt=""> Sign the Guestbook!</h3>
+          <p><i>Drop your name — no account needed!</i></p>
+          <p><i>Visiting again? No worries — your name only shows up once.</i></p>
+          <div class="guestbook-form">
+            <input type="text" id="guest-name-input" class="guestbook-input" placeholder="Your name" maxlength="50">
+            <textarea id="guest-note-input" class="guestbook-textarea" placeholder="Leave a note (optional)" maxlength="200" rows="2"></textarea>
+            <button id="guest-submit-btn" class="btn">Sign In</button>
+          </div>
+          <div id="guestbook-status"></div>
         </div>
 
-        <div class="sidebar-box" id="entries-nav">
-          <h3>Entries</h3>
-          <ul id="entries-list">
+        <div class="info-box">
+          <h3><img src="https://unpkg.com/pixelarticons/svg/users.svg" class="pixel-icon pixel-icon-gray" alt=""> Visitors</h3>
+          <ul id="guests-list-main">
             <li><i>Loading...</i></li>
           </ul>
         </div>
 
-        <div class="sidebar-box" id="guests-box">
-          <h3>Guests</h3>
-          <ul id="guests-list">
-            <li><i>Loading...</i></li>
-          </ul>
+        <div class="info-box">
+          <h3><img src="https://unpkg.com/pixelarticons/svg/message.svg" class="pixel-icon pixel-icon-gray" alt=""> Guestbook Notes</h3>
+          <div id="guestbook-notes">
+            <p><i>Loading...</i></p>
+          </div>
         </div>
 
-        <div class="sidebar-box">
-          <h3>Hit Counter</h3>
+        <div class="info-box">
+          <h3><img src="https://unpkg.com/pixelarticons/svg/chart.svg" class="pixel-icon pixel-icon-gray" alt=""> Hit Counter</h3>
           <div class="hit-counter">
             <p>You are visitor #<span id="my-visitor-number">...</span></p>
             <p>Total visits: <span id="visitor-count">...</span></p>
           </div>
         </div>
 
-        <div class="sidebar-box instagram-sidebar">
-          <h3>Instagram</h3>
-          <iframe src="https://www.instagram.com/nz_logs/embed" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
-        </div>
-
-        <div class="sidebar-box">
-          <h3>Links</h3>
+        <div class="info-box">
+          <h3><img src="https://unpkg.com/pixelarticons/svg/link.svg" class="pixel-icon pixel-icon-gray" alt=""> Links</h3>
           <ul>
-            <li><a href="https://www.newzealand.com" target="_blank">NZ Tourism</a></li>
-            <li><a href="https://www.doc.govt.nz" target="_blank">DOC NZ</a></li>
+            <li><a href="https://www.newzealand.com" target="_blank" rel="noopener">NZ Tourism</a></li>
+            <li><a href="https://www.doc.govt.nz" target="_blank" rel="noopener">DOC NZ</a></li>
           </ul>
         </div>
 
-      </div>
-
-      <!-- Main Content -->
-      <div class="main-content">
-        <div id="posts-container">
-          <p class="no-posts">Loading posts...</p>
+        <div class="info-box instagram-box">
+          <h3><img src="https://unpkg.com/pixelarticons/svg/camera.svg" class="pixel-icon pixel-icon-gray" alt=""> Instagram</h3>
+          <iframe src="https://www.instagram.com/nz_logs/embed" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
         </div>
 
-        <!-- Guestbook -->
-        <div class="guestbook-section" id="guestbook">
-          <h2>Sign the Guestbook!</h2>
-          <div class="guestbook-columns">
-            <!-- Left: form + name list -->
-            <div class="guestbook-left">
-              <div class="sidebar-box">
-                <p><i>Drop your name — no account needed!</i></p>
-                <p><i>Visiting again? No worries — your name only shows up once.</i></p>
-                <div class="guestbook-form">
-                  <input type="text" id="guest-name-input" class="guestbook-input" placeholder="Your name" maxlength="50">
-                  <textarea id="guest-note-input" class="guestbook-textarea" placeholder="Leave a note (optional)" maxlength="200" rows="2"></textarea>
-                  <button id="guest-submit-btn" class="btn">Sign In</button>
-                </div>
-                <div id="guestbook-status"></div>
-              </div>
-              <div class="sidebar-box">
-                <h3>Visitors</h3>
-                <ul id="guests-list-main">
-                  <li><i>Loading...</i></li>
-                </ul>
-              </div>
-            </div>
-            <!-- Right: notes -->
-            <div class="guestbook-right">
-              <div class="sidebar-box">
-                <h3>Guestbook Notes</h3>
-                <div id="guestbook-notes">
-                  <p><i>Loading...</i></p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      </section>
+
     </div>
 
     <!-- Footer -->
@@ -141,12 +126,18 @@
   </div>
 </div>
 
+<!-- Post Detail Modal -->
+<div id="post-modal" class="post-modal" aria-hidden="true" role="dialog" aria-modal="true"></div>
+
 <script src="js/instagram.js"></script>
 <script src="js/main.js"></script>
 <script>
   // Load Leaflet + map.js only when the map section nears the viewport
   (function () {
+    var mapLoaded = false;
     function loadMap() {
+      if (mapLoaded) return;
+      mapLoaded = true;
       var s = document.createElement("script");
       s.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
       s.onload = function () {
@@ -165,6 +156,10 @@
       if (entries[0].isIntersecting) { o.disconnect(); loadMap(); }
     }, { rootMargin: "200px" });
     obs.observe(mapSection);
+    // Also load map if user switches to Feed tab after initially being on Info.
+    window.addEventListener("nz:tabchange", function (e) {
+      if (e.detail && e.detail.tab === "feed") loadMap();
+    });
   })();
 </script>
 </body>
