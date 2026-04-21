@@ -23,7 +23,6 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     } else {
       showGate();
     }
-    loadVisitorCount();
     loadGuestbook();
     initGuestbook();
   });
@@ -66,35 +65,30 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
   }
   window.switchTab = switchTab;
 
-  // ── Visitor counter ───────────────────────────────────────────────────────────
+  // ── Visitor counter (derived from guestbook) ─────────────────────────────────
 
-  function loadVisitorCount() {
+  function updateVisitorCounter(totalCount) {
     var totalEl = document.getElementById("visitor-count");
     var myEl = document.getElementById("my-visitor-number");
-    if (!totalEl) return;
+    if (totalEl) totalEl.textContent = String(totalCount);
+    if (myEl) {
+      var stored = localStorage.getItem("nz_logs_my_visitor_number");
+      if (!stored) {
+        stored = String(totalCount + 1);
+        try { localStorage.setItem("nz_logs_my_visitor_number", stored); } catch (_) {}
+      }
+      myEl.textContent = stored;
+    }
+  }
 
-    fetch("https://api.counterapi.dev/v1/thekeeks-nz-logs/visits/up")
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        var count = String(data.count);
-        totalEl.textContent = count;
-
-        if (myEl) {
-          var myNumber = localStorage.getItem("nz_logs_my_visitor_number");
-          if (!myNumber) {
-            myNumber = count;
-            localStorage.setItem("nz_logs_my_visitor_number", myNumber);
-          }
-          myEl.textContent = myNumber;
-        }
-      })
-      .catch(function () {
-        if (totalEl) totalEl.textContent = "?";
-        if (myEl) {
-          var stored = localStorage.getItem("nz_logs_my_visitor_number");
-          myEl.textContent = stored || "?";
-        }
-      });
+  function setVisitorCounterError() {
+    var totalEl = document.getElementById("visitor-count");
+    var myEl = document.getElementById("my-visitor-number");
+    if (totalEl) totalEl.textContent = "?";
+    if (myEl) {
+      var stored = localStorage.getItem("nz_logs_my_visitor_number");
+      myEl.textContent = stored || "?";
+    }
   }
 
   // ── Sign-in gate ──────────────────────────────────────────────────────────────
@@ -216,7 +210,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
         '</div>' +
         '<div class="card-body">' +
           (loc
-            ? '<div class="card-location"><img src="https://unpkg.com/pixelarticons/svg/map.svg" class="pixel-icon pixel-icon-green" alt=""> ' + loc + '</div>'
+            ? '<div class="card-location"><img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="pixel-icon pixel-icon-green" alt=""> ' + loc + '</div>'
             : '') +
           '<h3 class="card-title">' + escapeHtml(post.title) + '</h3>' +
           '<p class="card-teaser">' + escapeHtml(teaser) + '</p>' +
@@ -309,7 +303,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
         '<div class="post-modal-titlebar">' +
           '<span class="post-modal-title">' + escapeHtml(titleText) + '</span>' +
           '<button type="button" class="post-modal-close" aria-label="Close">' +
-            '<img src="https://unpkg.com/pixelarticons/svg/close.svg" class="pixel-icon pixel-icon-white" alt="">' +
+            '<span aria-hidden="true">&#10005;</span>' +
           '</button>' +
         '</div>' +
         '<div class="post-modal-body">' +
@@ -318,7 +312,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
               ? '<span class="post-date"><img src="https://unpkg.com/pixelarticons/svg/calendar.svg" class="pixel-icon pixel-icon-gray" alt=""> ' + escapeHtml(dateStr) + '</span>'
               : '') +
             (post.location
-              ? '<span class="post-location"><img src="https://unpkg.com/pixelarticons/svg/map.svg" class="pixel-icon pixel-icon-green" alt=""> ' + escapeHtml(post.location) + '</span>'
+              ? '<span class="post-location"><img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="pixel-icon pixel-icon-green" alt=""> ' + escapeHtml(post.location) + '</span>'
               : '') +
           '</div>' +
           '<h2 class="post-modal-heading">' + escapeHtml(titleText) + '</h2>' +
@@ -452,6 +446,8 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     var mainList = document.getElementById("guests-list-main");
     var notesPanel = document.getElementById("guestbook-notes");
 
+    updateVisitorCounter(guests.length);
+
     if (!guests.length) {
       var emptyNames = "<li><i>No visitors yet!</i></li>";
       if (mainList) mainList.innerHTML = emptyNames;
@@ -481,6 +477,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     var notesPanel = document.getElementById("guestbook-notes");
     if (mainList) mainList.innerHTML = msg;
     if (notesPanel) notesPanel.innerHTML = "<p><i>Could not load notes.</i></p>";
+    setVisitorCounterError();
   }
 
   function showGuestStatus(msg, type) {
