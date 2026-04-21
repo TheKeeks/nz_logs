@@ -46,7 +46,7 @@
 
         <!-- Visit Map -->
         <div class="map-section" id="map-section">
-          <div class="map-section-title"><img src="https://unpkg.com/pixelarticons/svg/map.svg" class="pixel-icon pixel-icon-white" alt=""> Where We've Been</div>
+          <div class="map-section-title"><img src="https://unpkg.com/pixelarticons/svg/map-pin-check.svg" class="pixel-icon pixel-icon-white" alt=""> Where We've Been</div>
           <div id="visit-map"></div>
         </div>
 
@@ -67,23 +67,23 @@
         </div>
 
         <!-- Guestbook -->
+        <div class="info-box">
+          <h3><img src="https://unpkg.com/pixelarticons/svg/users.svg" class="pixel-icon pixel-icon-gray" alt=""> Visitors</h3>
+          <ul id="guests-list-main">
+            <li><i>Loading...</i></li>
+          </ul>
+        </div>
+
         <div class="info-box" id="guestbook">
           <h3><img src="https://unpkg.com/pixelarticons/svg/edit.svg" class="pixel-icon pixel-icon-gray" alt=""> Sign the Guestbook!</h3>
-          <p><i>Drop your name — no account or signup needed!</i></p>
-          <p><i>Visiting again? No worries — your name only shows up once.</i></p>
+          <p><i>Drop your name. No account or signup needed!</i></p>
+          <p><i>Visiting again? No worries. Your name only shows up once.</i></p>
           <div class="guestbook-form">
             <input type="text" id="guest-name-input" class="guestbook-input" placeholder="Your name" maxlength="50">
             <textarea id="guest-note-input" class="guestbook-textarea" placeholder="Leave a note (optional)" maxlength="200" rows="2"></textarea>
             <button id="guest-submit-btn" class="btn">Sign In</button>
           </div>
           <div id="guestbook-status"></div>
-        </div>
-
-        <div class="info-box">
-          <h3><img src="https://unpkg.com/pixelarticons/svg/users.svg" class="pixel-icon pixel-icon-gray" alt=""> Visitors</h3>
-          <ul id="guests-list-main">
-            <li><i>Loading...</i></li>
-          </ul>
         </div>
 
         <div class="info-box">
