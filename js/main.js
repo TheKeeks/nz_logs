@@ -12,8 +12,12 @@ var JSONBIN_KEY = "$2a$10$lzm5XzmGnTkKtV4sx.hEtO3Ir2o87zWSQcpFr9NlfzBTVsa3Q.ijG"
 var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
 
 (function () {
+  var publishedPosts = [];
+
   document.addEventListener("DOMContentLoaded", function () {
     initLightbox();
+    initTabs();
+    initPostModal();
     if (isSigned()) {
       loadPosts();
     } else {
@@ -23,6 +27,46 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     loadGuestbook();
     initGuestbook();
   });
+
+  // ── Tabs ──────────────────────────────────────────────────────────────────────
+
+  function initTabs() {
+    var tabBar = document.querySelector(".tab-bar");
+    if (!tabBar) return;
+    tabBar.addEventListener("click", function (e) {
+      var btn = e.target.closest(".tab-btn");
+      if (!btn) return;
+      switchTab(btn.getAttribute("data-tab"));
+    });
+
+    var saved = null;
+    try { saved = localStorage.getItem("nz_logs_active_tab"); } catch (_) {}
+    if (saved) switchTab(saved);
+  }
+
+  function switchTab(tab) {
+    var buttons = document.querySelectorAll(".tab-btn");
+    var panels = document.querySelectorAll(".tab-panel");
+    buttons.forEach(function (b) {
+      var active = b.getAttribute("data-tab") === tab;
+      b.classList.toggle("active", active);
+      b.setAttribute("aria-selected", active ? "true" : "false");
+    });
+    panels.forEach(function (p) {
+      var show = p.id === "tab-" + tab;
+      if (show) p.removeAttribute("hidden");
+      else p.setAttribute("hidden", "");
+    });
+    try { localStorage.setItem("nz_logs_active_tab", tab); } catch (_) {}
+    try {
+      window.dispatchEvent(new CustomEvent("nz:tabchange", { detail: { tab: tab } }));
+    } catch (_) {}
+    // Scroll to top of new tab for better UX
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  }
+  window.switchTab = switchTab;
+
+  // ── Visitor counter ───────────────────────────────────────────────────────────
 
   function loadVisitorCount() {
     var totalEl = document.getElementById("visitor-count");
@@ -35,7 +79,6 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
         var count = String(data.count);
         totalEl.textContent = count;
 
-        // Store device-specific visitor number on first visit
         if (myEl) {
           var myNumber = localStorage.getItem("nz_logs_my_visitor_number");
           if (!myNumber) {
@@ -53,6 +96,8 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
         }
       });
   }
+
+  // ── Sign-in gate ──────────────────────────────────────────────────────────────
 
   function isSigned() {
     return !!localStorage.getItem("nz_logs_signed");
@@ -76,12 +121,22 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
             'Sign In Required' +
           '</div>' +
           '<div class="gate-body">' +
-            '<p>Sign the guestbook below to access the travel log.</p>' +
-            '<a href="#guestbook" class="btn">Go to Guestbook</a>' +
+            '<p>Sign the guestbook in the Info tab to access the travel log.</p>' +
+            '<button type="button" class="btn" id="gate-go-info">Go to Info</button>' +
           '</div>' +
         '</div>' +
       '</div>';
+    var btn = document.getElementById("gate-go-info");
+    if (btn) {
+      btn.addEventListener("click", function () {
+        switchTab("info");
+        var gb = document.getElementById("guestbook");
+        if (gb) gb.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   }
+
+  // ── Posts ─────────────────────────────────────────────────────────────────────
 
   function loadPosts() {
     fetch(CONFIG.postsFile + "?t=" + Date.now())
@@ -91,9 +146,9 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
       })
       .then(function (data) {
         renderMarquee(data.marquee);
-        renderPosts(data.posts || []);
-        updateLastUpdated(data.posts || []);
-        renderEntriesNav(data.posts || []);
+        publishedPosts = (data.posts || []).filter(function (p) { return p.published; });
+        renderCards(publishedPosts);
+        updateLastUpdated(publishedPosts);
       })
       .catch(function (err) {
         console.error(err);
@@ -122,10 +177,196 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     }
   }
 
+  // ── Card feed ─────────────────────────────────────────────────────────────────
+
+  function renderCards(posts) {
+    var container = document.getElementById("posts-container");
+    if (!container) return;
+
+    if (!posts.length) {
+      container.innerHTML = '<p class="no-posts">No posts yet. Check back soon!</p>';
+      return;
+    }
+
+    var html = '<div class="card-feed">';
+    posts.forEach(function (post) {
+      html += buildCardHtml(post);
+    });
+    html += '</div>';
+    container.innerHTML = html;
+
+    container.addEventListener("click", onCardClick);
+  }
+
+  function buildCardHtml(post) {
+    var thumb = firstImageSrc(post.body);
+    var badge = dateBadge(post.date);
+    var teaser = makeTeaser(post.body, 160);
+    var loc = post.location ? escapeHtml(post.location) : "";
+
+    return (
+      '<article class="post-card" data-post-id="' + escapeAttr(post.id) + '" tabindex="0" role="button" aria-label="Open post: ' + escapeAttr(post.title) + '">' +
+        '<div class="card-thumb">' +
+          (thumb
+            ? '<img loading="lazy" src="' + escapeAttr(thumb) + '" alt="">'
+            : '<div class="card-thumb-empty"></div>') +
+          (badge
+            ? '<span class="card-date-badge"><span class="dm">' + badge.month + '</span><span class="dd">' + badge.day + '</span></span>'
+            : '') +
+        '</div>' +
+        '<div class="card-body">' +
+          (loc
+            ? '<div class="card-location"><img src="https://unpkg.com/pixelarticons/svg/map.svg" class="pixel-icon pixel-icon-green" alt=""> ' + loc + '</div>'
+            : '') +
+          '<h3 class="card-title">' + escapeHtml(post.title) + '</h3>' +
+          '<p class="card-teaser">' + escapeHtml(teaser) + '</p>' +
+        '</div>' +
+      '</article>'
+    );
+  }
+
+  function firstImageSrc(bodyHtml) {
+    if (!bodyHtml) return "";
+    var m = bodyHtml.match(/<img[^>]*\ssrc\s*=\s*["']([^"']+)["']/i);
+    return m ? m[1] : "";
+  }
+
+  function makeTeaser(bodyHtml, len) {
+    if (!bodyHtml) return "";
+    var tmp = document.createElement("div");
+    tmp.innerHTML = bodyHtml;
+    // Drop figures so image captions don't leak in and they're already represented by the thumbnail.
+    tmp.querySelectorAll("figure").forEach(function (f) { f.remove(); });
+    var text = (tmp.textContent || "").replace(/\s+/g, " ").trim();
+    if (text.length <= len) return text;
+    return text.slice(0, len).replace(/[\s,.;:!?-]+$/, "") + "…";
+  }
+
+  function dateBadge(dateStr) {
+    if (!dateStr) return null;
+    var d = new Date(dateStr + "T00:00:00");
+    if (isNaN(d.getTime())) return null;
+    return {
+      month: d.toLocaleDateString("en-US", { month: "short" }).toUpperCase(),
+      day: String(d.getDate()),
+    };
+  }
+
+  function onCardClick(e) {
+    var card = e.target.closest(".post-card");
+    if (!card) return;
+    var id = card.getAttribute("data-post-id");
+    var post = publishedPosts.find(function (p) { return p.id === id; });
+    if (post) openPostModal(post);
+  }
+
+  // ── Post detail modal ─────────────────────────────────────────────────────────
+
+  function initPostModal() {
+    var overlay = document.getElementById("post-modal");
+    if (!overlay) return;
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) closePostModal();
+      var closeBtn = e.target.closest(".post-modal-close");
+      if (closeBtn) closePostModal();
+      // Lightbox delegation for images inside the modal body
+      var img = e.target.closest(".post-image img");
+      if (img) openLightbox(img.src, img.getAttribute("alt") || "");
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && overlay.classList.contains("active")) {
+        closePostModal();
+      }
+    });
+    // Open on Enter/Space when focused on a card
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      var card = document.activeElement && document.activeElement.closest
+        ? document.activeElement.closest(".post-card")
+        : null;
+      if (!card) return;
+      e.preventDefault();
+      var id = card.getAttribute("data-post-id");
+      var post = publishedPosts.find(function (p) { return p.id === id; });
+      if (post) openPostModal(post);
+    });
+  }
+
+  function openPostModal(post) {
+    var overlay = document.getElementById("post-modal");
+    if (!overlay) return;
+
+    var dateStr = "";
+    if (post.date) {
+      var d = new Date(post.date + "T00:00:00");
+      dateStr = d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    }
+
+    var titleText = post.title || "Post";
+
+    overlay.innerHTML =
+      '<div class="post-modal-dialog" role="document">' +
+        '<div class="post-modal-titlebar">' +
+          '<span class="post-modal-title">' + escapeHtml(titleText) + '</span>' +
+          '<button type="button" class="post-modal-close" aria-label="Close">' +
+            '<img src="https://unpkg.com/pixelarticons/svg/close.svg" class="pixel-icon pixel-icon-white" alt="">' +
+          '</button>' +
+        '</div>' +
+        '<div class="post-modal-body">' +
+          '<div class="post-modal-meta">' +
+            (dateStr
+              ? '<span class="post-date"><img src="https://unpkg.com/pixelarticons/svg/calendar.svg" class="pixel-icon pixel-icon-gray" alt=""> ' + escapeHtml(dateStr) + '</span>'
+              : '') +
+            (post.location
+              ? '<span class="post-location"><img src="https://unpkg.com/pixelarticons/svg/map.svg" class="pixel-icon pixel-icon-green" alt=""> ' + escapeHtml(post.location) + '</span>'
+              : '') +
+          '</div>' +
+          '<h2 class="post-modal-heading">' + escapeHtml(titleText) + '</h2>' +
+          '<div class="post-body">' + (post.body || "") + '</div>' +
+        '</div>' +
+      '</div>';
+
+    overlay.classList.add("active");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+
+    var bodyEl = overlay.querySelector(".post-modal-body");
+    if (bodyEl) {
+      applyImageEnhancements(bodyEl, 2);
+      // Instagram embeds
+      if (bodyEl.innerHTML.indexOf("{{instagram:") !== -1 && window.Instagram) {
+        var inner = bodyEl.querySelector(".post-body");
+        if (inner) {
+          Instagram.resolveEmbeds(inner.innerHTML).then(function (resolved) {
+            inner.innerHTML = resolved;
+            Instagram.processEmbeds();
+          });
+        }
+      } else if (window.Instagram) {
+        Instagram.processEmbeds();
+      }
+    }
+
+    // Reset scroll to top of modal body each time it opens
+    if (bodyEl) bodyEl.scrollTop = 0;
+  }
+
+  function closePostModal() {
+    var overlay = document.getElementById("post-modal");
+    if (!overlay) return;
+    overlay.classList.remove("active");
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML = "";
+    document.body.classList.remove("modal-open");
+  }
+
+  // ── Image enhancements (loading/error states) ────────────────────────────────
+
   function applyImageEnhancements(container, eagerCount) {
     var imgs = container.querySelectorAll(".post-image img");
     imgs.forEach(function (img, i) {
       var figure = img.closest(".post-image");
+      if (!figure) return;
       img.setAttribute("loading", i < eagerCount ? "eager" : "lazy");
       if (!img.complete) {
         figure.classList.add("img-loading");
@@ -140,149 +381,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     });
   }
 
-  function deferImages(bodyHtml) {
-    return bodyHtml.replace(/<img\s([^>]*?)src\s*=\s*"([^"]*?)"/gi, '<img $1data-src="$2" src=""');
-  }
-
-  function activateImages(postEl) {
-    var imgs = postEl.querySelectorAll(".post-image img[data-src]");
-    imgs.forEach(function (img) {
-      img.setAttribute("src", img.getAttribute("data-src"));
-      img.removeAttribute("data-src");
-    });
-    applyImageEnhancements(postEl, 0);
-  }
-
-  function expandPost(postEl) {
-    if (!postEl.classList.contains("collapsed")) return;
-
-    // Accordion: collapse all other expanded posts
-    var container = document.getElementById("posts-container");
-    var allPosts = container.querySelectorAll(".post:not(.collapsed)");
-    allPosts.forEach(function (other) {
-      if (other !== postEl) collapsePost(other);
-    });
-
-    postEl.classList.remove("collapsed");
-    var toggle = postEl.querySelector(".post-toggle");
-    if (toggle) toggle.textContent = "[-]";
-
-    // Activate deferred images on first expand
-    if (postEl.querySelectorAll(".post-image img[data-src]").length > 0) {
-      activateImages(postEl);
-      // Process Instagram embeds in this post
-      var bodyDiv = postEl.querySelector(".post-body");
-      if (bodyDiv && bodyDiv.innerHTML.indexOf("{{instagram:") !== -1) {
-        Instagram.resolveEmbeds(bodyDiv.innerHTML).then(function (resolved) {
-          bodyDiv.innerHTML = resolved;
-          Instagram.processEmbeds();
-        });
-      }
-    }
-  }
-
-  function collapsePost(postEl) {
-    if (postEl.classList.contains("collapsed")) return;
-    postEl.classList.add("collapsed");
-    var toggle = postEl.querySelector(".post-toggle");
-    if (toggle) toggle.textContent = "[+]";
-  }
-
-  function togglePost(postEl) {
-    if (postEl.classList.contains("collapsed")) {
-      expandPost(postEl);
-    } else {
-      collapsePost(postEl);
-    }
-  }
-
-  function renderPosts(posts) {
-    var container = document.getElementById("posts-container");
-    if (!container) return;
-
-    if (posts.length === 0) {
-      container.innerHTML =
-        '<p class="no-posts">No posts yet. Check back soon!</p>';
-      return;
-    }
-
-    var html = "";
-    var publishedIndex = 0;
-    posts.forEach(function (post, index) {
-      if (!post.published) return;
-
-      var isNewest = publishedIndex === 0;
-      publishedIndex++;
-
-      var dateStr = "";
-      if (post.date) {
-        var d = new Date(post.date + "T00:00:00");
-        var options = { year: "numeric", month: "long", day: "numeric" };
-        dateStr = d.toLocaleDateString("en-US", options);
-      }
-
-      var collapsed = !isNewest;
-      html += '<div class="post' + (collapsed ? " collapsed" : "") + '" id="post-' + post.id + '">';
-
-      // Clickable header with toggle
-      html += '<div class="post-header">';
-      html += '<span class="post-toggle">' + (collapsed ? "[+]" : "[-]") + "</span>";
-      if (dateStr) {
-        html += '<span class="post-date"><img src="https://unpkg.com/pixelarticons/svg/calendar.svg" class="pixel-icon pixel-icon-gray" alt=""> ' + dateStr + "</span> ";
-      }
-      if (post.location) {
-        html += '<span class="post-location"><img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="pixel-icon pixel-icon-green" alt=""> ' + escapeHtml(post.location) + "</span> ";
-      }
-      html += "<h2>" + escapeHtml(post.title) + "</h2>";
-      html += "</div>";
-
-      // Body — defer images for collapsed posts
-      var bodyHtml = collapsed ? deferImages(post.body) : post.body;
-      html += '<div class="post-body">' + bodyHtml + "</div>";
-
-      if (index < posts.length - 1) {
-        html += "<hr>";
-      }
-      html += "</div>";
-    });
-
-    container.innerHTML = html;
-
-    // Apply image enhancements only to the expanded (newest) post
-    var newestPost = container.querySelector(".post:not(.collapsed)");
-    if (newestPost) {
-      applyImageEnhancements(newestPost, 2);
-    }
-
-    // Click delegation for post headers
-    container.addEventListener("click", function (e) {
-      var header = e.target.closest(".post-header");
-      if (header) {
-        var postEl = header.closest(".post");
-        if (postEl) togglePost(postEl);
-        return;
-      }
-
-      // Lightbox delegation
-      var img = e.target.closest(".post-image img");
-      if (!img) return;
-      openLightbox(img.src, img.getAttribute("alt") || "");
-    });
-
-    // Process any Instagram embeds already in the HTML (newest post)
-    Instagram.processEmbeds();
-
-    // Also resolve any remaining {{instagram:}} placeholders (fallback) for newest post
-    if (newestPost) {
-      var bodyDiv = newestPost.querySelector(".post-body");
-      if (bodyDiv && bodyDiv.innerHTML.indexOf("{{instagram:") !== -1) {
-        Instagram.resolveEmbeds(bodyDiv.innerHTML).then(function (resolved) {
-          bodyDiv.innerHTML = resolved;
-          Instagram.processEmbeds();
-        });
-      }
-    }
-  }
+  // ── Lightbox (reused) ─────────────────────────────────────────────────────────
 
   function initLightbox() {
     if (document.getElementById("lightbox-overlay")) return;
@@ -324,77 +423,19 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     if (img) img.src = "";
   }
 
-  function renderEntriesNav(posts) {
-    var list = document.getElementById("entries-list");
-    if (!list) return;
-
-    var published = posts.filter(function (p) { return p.published; });
-    if (published.length === 0) {
-      list.innerHTML = "<li><i>No entries yet</i></li>";
-      return;
-    }
-
-    var html = "";
-    published.forEach(function (post) {
-      var label = "";
-      if (post.date) {
-        var d = new Date(post.date + "T00:00:00");
-        var month = d.toLocaleDateString("en-US", { month: "short" });
-        var day = d.getDate();
-        label = month + " " + day + " - ";
-      }
-      label += post.title;
-      html += '<li><a href="#post-' + post.id + '" data-post-id="' + post.id + '">' + escapeHtml(label) + "</a></li>";
-    });
-    list.innerHTML = html;
-
-    initSmoothScroll(list);
-    initScrollSpy(published);
-  }
-
-  function initSmoothScroll(list) {
-    list.addEventListener("click", function (e) {
-      var link = e.target.closest("a");
-      if (!link) return;
-      var target = document.getElementById("post-" + link.getAttribute("data-post-id"));
-      if (target) {
-        e.preventDefault();
-        expandPost(target);
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
-  }
-
-  function initScrollSpy(posts) {
-    var links = document.querySelectorAll("#entries-list a");
-    if (!links.length) return;
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        var id = entry.target.id.replace("post-", "");
-        var link = document.querySelector('#entries-list a[data-post-id="' + id + '"]');
-        if (!link) return;
-        if (entry.isIntersecting) {
-          // Remove active from all links
-          links.forEach(function (l) { l.classList.remove("active"); });
-          link.classList.add("active");
-        }
-      });
-    }, { rootMargin: "-10% 0px -80% 0px" });
-
-    posts.forEach(function (post) {
-      var el = document.getElementById("post-" + post.id);
-      if (el) observer.observe(el);
-    });
-  }
+  // ── Utilities ─────────────────────────────────────────────────────────────────
 
   function escapeHtml(str) {
     var div = document.createElement("div");
-    div.appendChild(document.createTextNode(str));
+    div.appendChild(document.createTextNode(str == null ? "" : String(str)));
     return div.innerHTML;
   }
 
-  // ── Guestbook ──────────────────────────────────────────────────────────────────────────────
+  function escapeAttr(str) {
+    return escapeHtml(str).replace(/"/g, "&quot;");
+  }
+
+  // ── Guestbook ─────────────────────────────────────────────────────────────────
 
   function loadGuestbook() {
     fetch("https://api.jsonbin.io/v3/b/" + JSONBIN_BIN_ID + "/latest")
@@ -408,16 +449,11 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
   }
 
   function renderGuestData(guests) {
-    // Sidebar guest list
-    var sidebarList = document.getElementById("guests-list");
-    // Main guestbook name list
     var mainList = document.getElementById("guests-list-main");
-    // Notes panel
     var notesPanel = document.getElementById("guestbook-notes");
 
     if (!guests.length) {
       var emptyNames = "<li><i>No visitors yet!</i></li>";
-      if (sidebarList) sidebarList.innerHTML = emptyNames;
       if (mainList) mainList.innerHTML = emptyNames;
       if (notesPanel) notesPanel.innerHTML = "<p><i>No notes yet — be the first!</i></p>";
       return;
@@ -435,17 +471,14 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
       }
     });
 
-    if (sidebarList) sidebarList.innerHTML = namesHtml;
     if (mainList) mainList.innerHTML = namesHtml;
     if (notesPanel) notesPanel.innerHTML = hasNotes ? notesHtml : "<p><i>No notes yet — be the first!</i></p>";
   }
 
   function setGuestLoadError() {
     var msg = "<li><i>Unavailable</i></li>";
-    var sidebarList = document.getElementById("guests-list");
     var mainList = document.getElementById("guests-list-main");
     var notesPanel = document.getElementById("guestbook-notes");
-    if (sidebarList) sidebarList.innerHTML = msg;
     if (mainList) mainList.innerHTML = msg;
     if (notesPanel) notesPanel.innerHTML = "<p><i>Could not load notes.</i></p>";
   }
@@ -473,7 +506,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
       }
 
       submitBtn.disabled = true;
-      showGuestStatus("Signing in\u2026", "info");
+      showGuestStatus("Signing in…", "info");
 
       fetch("https://api.jsonbin.io/v3/b/" + JSONBIN_BIN_ID + "/latest")
         .then(function (res) { return res.json(); })

@@ -18,6 +18,7 @@ a:active { color: #FF0000; }
 /* Page container — centered dialog box feel */
 .page-container {
   width: 760px;
+  max-width: 100%;
   margin: 10px auto;
   background-color: #ffffff;
   border-top: 2px solid #ffffff;
@@ -25,6 +26,7 @@ a:active { color: #FF0000; }
   border-bottom: 2px solid #808080;
   border-right: 2px solid #808080;
   padding: 0;
+  box-sizing: border-box;
 }
 
 /* Title bar */
@@ -74,107 +76,131 @@ a:active { color: #FF0000; }
   margin: 0;
 }
 
-/* Main layout — flexbox for sticky sidebar */
-.layout-flex {
+/* ============================================
+   Top Tab Nav
+   ============================================ */
+
+.tab-bar {
   display: flex;
-  gap: 4px;
-  align-items: flex-start;
+  gap: 2px;
+  padding: 0 4px;
+  margin: 6px 0 0 0;
+  border-bottom: 2px solid #808080;
 }
 
-/* Sidebar */
-.sidebar {
-  width: 180px;
-  min-width: 180px;
+.tab-btn {
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
-  position: sticky;
-  top: 0;
-  max-height: 100vh;
-  overflow-y: auto;
-  padding: 4px;
+  font-weight: bold;
+  color: #ffffff;
+  background: linear-gradient(to right, #000080, #1084d0);
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  border-right: 2px solid #808080;
+  padding: 4px 12px;
+  margin-bottom: -2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  top: 2px;
+  opacity: 0.85;
 }
 
+.tab-btn:hover {
+  opacity: 1;
+}
+
+.tab-btn.active {
+  opacity: 1;
+  background: #ffffff;
+  color: #000000;
+  border-bottom: 2px solid #ffffff;
+  top: 0;
+  padding-bottom: 6px;
+}
+
+.tab-btn.active .pixel-icon-white {
+  filter: none;
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+/* ============================================
+   Info Tab boxes (beveled "sidebar-box" look, reused)
+   ============================================ */
+
+.info-box,
 .sidebar-box {
   border-top: 2px solid #808080;
   border-left: 2px solid #808080;
   border-bottom: 2px solid #ffffff;
   border-right: 2px solid #ffffff;
   background-color: #f0f0f0;
-  padding: 6px;
+  padding: 8px;
   margin-bottom: 8px;
 }
 
+.info-box h3,
 .sidebar-box h3 {
   font-size: 12px;
-  margin: 0 0 4px 0;
+  margin: 0 0 6px 0;
   border-bottom: 1px solid #808080;
-  padding-bottom: 2px;
+  padding-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
+.info-box ul,
 .sidebar-box ul {
   list-style: square;
   padding-left: 18px;
   margin: 4px 0;
 }
 
+.info-box li,
 .sidebar-box li {
   margin-bottom: 2px;
 }
 
+.info-box p,
 .sidebar-box p {
   margin: 4px 0;
 }
 
-/* Entries nav list */
-#entries-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 4px 0;
-}
-
-#entries-list li {
-  margin-bottom: 1px;
-}
-
-#entries-list a {
-  display: block;
-  padding: 2px 4px;
+.info-box .last-updated {
   font-size: 11px;
-  color: #000000;
-  text-decoration: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #666666;
+  font-style: italic;
+  margin-top: 6px;
 }
 
-#entries-list a:hover {
-  background-color: #000080;
-  color: #ffffff;
-}
-
-#entries-list a.active {
-  background-color: #000080;
-  color: #ffffff;
-  font-weight: bold;
-}
-
-/* Instagram sidebar embed */
-.instagram-sidebar iframe {
+/* Instagram box (was .instagram-sidebar) */
+.instagram-box iframe {
   border-top: 2px solid #808080;
   border-left: 2px solid #808080;
   border-bottom: 2px solid #ffffff;
   border-right: 2px solid #ffffff;
-  width: 170px;
-  height: 400px;
+  width: 100%;
+  max-width: 340px;
+  height: 420px;
+  display: block;
 }
 
 /* Hit counter */
 .hit-counter {
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 4px;
 }
 
-#visitor-count {
+#visitor-count,
+#my-visitor-number {
   font-family: "Courier New", monospace;
   font-weight: bold;
   font-size: 13px;
@@ -182,108 +208,289 @@ a:active { color: #FF0000; }
 
 /* Main content area */
 .main-content {
-  flex: 1;
   min-width: 0;
-  border-left: 1px solid #c0c0c0;
-  padding: 4px 4px 4px 8px;
+  padding: 8px 4px 4px 4px;
 }
 
-/* Post cards */
-.post {
-  margin-bottom: 4px;
-  padding-bottom: 4px;
+/* ============================================
+   Card Feed
+   ============================================ */
+
+.card-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0;
 }
 
-.post .post-date {
+.post-card {
+  display: flex;
+  gap: 10px;
+  background-color: #f0f0f0;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  border-right: 2px solid #808080;
+  padding: 8px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+
+.post-card:hover,
+.post-card:focus {
+  background-color: #ffffff;
+}
+
+.post-card:focus-visible {
+  outline: 2px dotted #000080;
+  outline-offset: -4px;
+}
+
+.post-card:active {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+}
+
+.card-thumb {
+  position: relative;
+  flex: 0 0 auto;
+  width: 110px;
+  height: 110px;
+  background-color: #c0c0c0;
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  overflow: hidden;
+}
+
+.card-thumb img,
+.card-thumb-empty {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-thumb-empty {
+  background: repeating-linear-gradient(
+    45deg,
+    #c0c0c0 0 6px,
+    #d4d0c8 6px 12px
+  );
+}
+
+.card-date-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background-color: #ffffff;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  border-right: 2px solid #808080;
+  padding: 2px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  min-width: 28px;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.card-date-badge .dm {
+  font-size: 9px;
+  font-weight: bold;
+  color: #cc0000;
+  letter-spacing: 0.5px;
+}
+
+.card-date-badge .dd {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000;
+  margin-top: 1px;
+}
+
+.card-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.card-location {
   font-size: 11px;
+  color: #336633;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-location .pixel-icon {
+  width: 12px;
+  height: 12px;
+  margin-right: 0;
+}
+
+.card-title {
+  font-size: 14px;
+  margin: 0;
+  font-weight: bold;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-teaser {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #333333;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ============================================
+   Post Detail Modal
+   ============================================ */
+
+.post-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 900;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 10px;
+  overflow-y: auto;
+}
+
+.post-modal.active {
+  display: flex;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.post-modal-dialog {
+  background-color: #ffffff;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  border-right: 2px solid #808080;
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 40px);
+}
+
+.post-modal-titlebar {
+  background: linear-gradient(to right, #000080, #1084d0);
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 4px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  gap: 8px;
+}
+
+.post-modal-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.post-modal-close {
+  background-color: #d4d0c8;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  border-right: 2px solid #808080;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.post-modal-close:active {
+  border-top: 2px solid #808080;
+  border-left: 2px solid #808080;
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+}
+
+.post-modal-close .pixel-icon {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  filter: none;
+}
+
+.post-modal-body {
+  padding: 10px 14px 16px 14px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
+.post-modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.post-modal-meta .post-date {
   color: #666666;
 }
 
-.post .post-location {
-  font-size: 11px;
+.post-modal-meta .post-location {
   color: #336633;
   font-style: italic;
 }
 
-.post h2 {
-  font-size: 16px;
-  margin: 4px 0;
+.post-modal-heading {
+  font-size: 18px;
+  margin: 4px 0 10px 0;
+  line-height: 1.25;
 }
 
-.post .post-body {
-  line-height: 1.5;
-}
-
-.post .post-body p {
+.post-modal-body .post-body p {
   margin: 6px 0;
 }
 
-.post hr {
-  border: none;
-  border-top: 1px solid #c0c0c0;
-  margin: 12px 0;
-}
-
-/* Post collapse / expand (accordion) */
-
-.post-header {
-  cursor: pointer;
-  padding: 4px;
-  user-select: none;
-}
-
-.post-header:hover {
-  background-color: #d4d0c8;
-}
-
-.post-toggle {
-  font-family: monospace;
-  font-weight: bold;
-  margin-right: 4px;
-  font-size: 12px;
-}
-
-.post.collapsed .post-body {
-  display: none;
-}
-
-.post.collapsed hr {
-  display: none;
-}
-
-/* Instagram embeds in posts */
-.post .instagram-embed {
+.post-modal-body .instagram-embed {
   margin: 8px 0;
   text-align: center;
 }
 
-.post .instagram-embed blockquote {
+.post-modal-body .instagram-embed blockquote {
   margin: 0 auto;
-}
-
-/* Guestbook section */
-.guestbook-section {
-  border-top: 2px solid #808080;
-  margin-top: 12px;
-  padding-top: 8px;
-}
-
-.guestbook-section h2 {
-  font-size: 16px;
-  margin: 4px 0 8px 0;
-}
-
-/* Guestbook two-column layout */
-.guestbook-columns {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
-
-.guestbook-left,
-.guestbook-right {
-  flex: 1;
-  min-width: 0;
 }
 
 /* Guestbook form */
@@ -333,24 +540,18 @@ a:active { color: #FF0000; }
   color: #333333;
 }
 
-/* Sidebar guests list */
-#guests-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 4px 0;
-}
-
-#guests-list li {
-  font-size: 11px;
-  padding: 1px 4px;
-  margin-bottom: 1px;
-}
-
 #guests-list-main {
   list-style: square;
   padding-left: 18px;
   margin: 4px 0;
   font-size: 12px;
+  columns: 2;
+  -webkit-columns: 2;
+}
+
+#guests-list-main li {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
 }
 
 /* Pixel art icons */
@@ -803,3 +1004,84 @@ a:active { color: #FF0000; }
   padding: 4px 8px 6px;
   color: #000000;
 }
+
+/* ============================================
+   Responsive — mobile
+   ============================================ */
+
+@media (max-width: 760px) {
+  .page-container {
+    width: 100%;
+    margin: 0 auto;
+    border: none;
+  }
+
+  .page-inner {
+    padding: 6px;
+  }
+
+  .site-header h1 {
+    font-size: 20px;
+  }
+
+  .tab-bar {
+    padding: 0 2px;
+  }
+
+  .tab-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .main-content {
+    padding: 8px 2px;
+  }
+
+  .post-card {
+    padding: 6px;
+    gap: 8px;
+  }
+
+  .card-thumb {
+    width: 84px;
+    height: 84px;
+  }
+
+  .card-title {
+    font-size: 13px;
+  }
+
+  .card-teaser {
+    -webkit-line-clamp: 2;
+    font-size: 11px;
+  }
+
+  .post-modal {
+    padding: 0;
+  }
+
+  .post-modal-dialog {
+    border: none;
+    max-height: 100vh;
+    width: 100%;
+  }
+
+  .post-modal-body {
+    padding: 8px 10px 14px;
+  }
+
+  .post-modal-heading {
+    font-size: 16px;
+  }
+
+  #guests-list-main {
+    columns: 1;
+  }
+
+  .instagram-box iframe {
+    height: 380px;
+  }
+}
+
