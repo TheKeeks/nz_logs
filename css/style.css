@@ -187,8 +187,7 @@ a:active { color: #FF0000; }
   border-bottom: 2px solid #ffffff;
   border-right: 2px solid #ffffff;
   width: 100%;
-  max-width: 340px;
-  height: 420px;
+  height: 540px;
   display: block;
 }
 
@@ -372,7 +371,7 @@ a:active { color: #FF0000; }
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.6);
-  z-index: 900;
+  z-index: 1100;
   align-items: flex-start;
   justify-content: center;
   padding: 20px 10px;
@@ -435,6 +434,11 @@ body.modal-open {
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
+  font-family: "Segoe UI Symbol", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  color: #000000;
 }
 
 .post-modal-close:active {
@@ -442,13 +446,6 @@ body.modal-open {
   border-left: 2px solid #808080;
   border-bottom: 2px solid #ffffff;
   border-right: 2px solid #ffffff;
-}
-
-.post-modal-close .pixel-icon {
-  width: 14px;
-  height: 14px;
-  margin: 0;
-  filter: none;
 }
 
 .post-modal-body {
@@ -931,7 +928,7 @@ body.modal-open {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.6);
-  z-index: 1000;
+  z-index: 1200;
   align-items: center;
   justify-content: center;
 }
