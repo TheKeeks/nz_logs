@@ -66,9 +66,7 @@ var CONFIG = {
     var btn = document.getElementById("window-close-btn");
     if (!btn) return;
     btn.addEventListener("click", function () {
-      window.close();
-      // Opened directly (not via window.open) — browsers won't close it, so go home.
-      setTimeout(function () { window.location.href = "index.html"; }, 150);
+      window.location.href = "index.html";
     });
   }
 

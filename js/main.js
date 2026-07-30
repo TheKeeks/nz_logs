@@ -198,7 +198,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     var loc = post.location ? escapeHtml(post.location) : "";
 
     return (
-      '<article class="post-card" data-post-id="' + escapeAttr(post.id) + '" tabindex="0" role="button" aria-label="Open post in its own window: ' + escapeAttr(post.title) + '">' +
+      '<article class="post-card" data-post-id="' + escapeAttr(post.id) + '" tabindex="0" role="button" aria-label="Open post: ' + escapeAttr(post.title) + '">' +
         '<div class="card-thumb">' +
           (thumb
             ? '<img loading="lazy" src="' + escapeAttr(thumb) + '" alt="">'
@@ -250,22 +250,13 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     if (!card) return;
     var id = card.getAttribute("data-post-id");
     var post = publishedPosts.find(function (p) { return p.id === id; });
-    if (post) openPostWindow(post.id);
+    if (post) openPostPage(post.id);
   }
 
-  // ── Post windows ──────────────────────────────────────────────────────────────
+  // ── Post pages ────────────────────────────────────────────────────────────────
 
-  function openPostWindow(id) {
-    var url = "post.html?id=" + encodeURIComponent(id);
-    // Named per post so each story gets its own window; re-clicking refocuses it.
-    var name = "nzlog_post_" + id.replace(/[^a-zA-Z0-9_-]/g, "_");
-    var win = window.open(url, name, "width=800,height=920,resizable=yes,scrollbars=yes");
-    if (win) {
-      win.focus();
-    } else {
-      // Popup blocked — fall back to navigating in this window
-      window.location.href = url;
-    }
+  function openPostPage(id) {
+    window.location.href = "post.html?id=" + encodeURIComponent(id);
   }
 
   function initCardKeyboard() {
@@ -279,7 +270,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
       e.preventDefault();
       var id = card.getAttribute("data-post-id");
       var post = publishedPosts.find(function (p) { return p.id === id; });
-      if (post) openPostWindow(post.id);
+      if (post) openPostPage(post.id);
     });
   }
 
