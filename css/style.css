@@ -363,56 +363,17 @@ a:active { color: #FF0000; }
 }
 
 /* ============================================
-   Post Detail Modal
+   Single Post Window (post.html)
    ============================================ */
 
-.post-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 1100;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 20px 10px;
-  overflow-y: auto;
-}
-
-.post-modal.active {
-  display: flex;
-}
-
-body.modal-open {
-  overflow: hidden;
-}
-
-.post-modal-dialog {
-  background-color: #ffffff;
-  border-top: 2px solid #ffffff;
-  border-left: 2px solid #ffffff;
-  border-bottom: 2px solid #808080;
-  border-right: 2px solid #808080;
-  width: 100%;
-  max-width: 720px;
-  display: flex;
-  flex-direction: column;
-  max-height: calc(100vh - 40px);
-}
-
-.post-modal-titlebar {
-  background: linear-gradient(to right, #000080, #1084d0);
-  color: #ffffff;
-  font-weight: bold;
-  font-size: 13px;
-  padding: 4px 6px;
+.post-window-titlebar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  user-select: none;
   gap: 8px;
 }
 
-.post-modal-title {
+.post-window-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -420,7 +381,7 @@ body.modal-open {
   flex: 1;
 }
 
-.post-modal-close {
+.window-close-btn {
   background-color: #d4d0c8;
   border-top: 2px solid #ffffff;
   border-left: 2px solid #ffffff;
@@ -441,20 +402,19 @@ body.modal-open {
   color: #000000;
 }
 
-.post-modal-close:active {
+.window-close-btn:active {
   border-top: 2px solid #808080;
   border-left: 2px solid #808080;
   border-bottom: 2px solid #ffffff;
   border-right: 2px solid #ffffff;
 }
 
-.post-modal-body {
-  padding: 10px 14px 16px 14px;
-  overflow-y: auto;
+.post-content {
   line-height: 1.5;
+  padding: 4px 6px;
 }
 
-.post-modal-meta {
+.post-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -462,32 +422,37 @@ body.modal-open {
   margin-bottom: 2px;
 }
 
-.post-modal-meta .post-date {
+.post-meta .post-date {
   color: #666666;
 }
 
-.post-modal-meta .post-location {
+.post-meta .post-location {
   color: #336633;
   font-style: italic;
 }
 
-.post-modal-heading {
+.post-heading {
   font-size: 18px;
   margin: 4px 0 10px 0;
   line-height: 1.25;
 }
 
-.post-modal-body .post-body p {
+.post-content .post-body p {
   margin: 6px 0;
 }
 
-.post-modal-body .instagram-embed {
+.post-content .instagram-embed {
   margin: 8px 0;
   text-align: center;
 }
 
-.post-modal-body .instagram-embed blockquote {
+.post-content .instagram-embed blockquote {
   margin: 0 auto;
+}
+
+.post-backlink {
+  margin: 12px 6px 4px;
+  font-size: 12px;
 }
 
 /* Guestbook form */
@@ -943,10 +908,16 @@ body.modal-open {
   border-left: 2px solid #ffffff;
   border-bottom: 2px solid #808080;
   border-right: 2px solid #808080;
-  max-width: 90vw;
-  max-height: 90vh;
+  max-width: 96vw;
+  max-height: 96vh;
   display: flex;
   flex-direction: column;
+}
+
+.lightbox-btns {
+  display: inline-flex;
+  gap: 4px;
+  flex: 0 0 auto;
 }
 
 #lightbox-titlebar {
@@ -961,7 +932,8 @@ body.modal-open {
   user-select: none;
 }
 
-#lightbox-close-btn {
+#lightbox-close-btn,
+#lightbox-zoom-btn {
   background-color: #d4d0c8;
   border-top: 2px solid #ffffff;
   border-left: 2px solid #ffffff;
@@ -974,7 +946,8 @@ body.modal-open {
   line-height: 1;
 }
 
-#lightbox-close-btn:active {
+#lightbox-close-btn:active,
+#lightbox-zoom-btn:active {
   border-top: 2px solid #808080;
   border-left: 2px solid #808080;
   border-bottom: 2px solid #ffffff;
@@ -988,10 +961,19 @@ body.modal-open {
 }
 
 #lightbox-body img {
-  max-width: 80vw;
-  max-height: 75vh;
+  max-width: 92vw;
+  max-height: 82vh;
   display: block;
   margin: 0 auto;
+  cursor: zoom-in;
+}
+
+/* Full-resolution view — scroll to pan around the big photos */
+#lightbox-body.zoomed img {
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  cursor: zoom-out;
 }
 
 #lightbox-caption {
@@ -1055,21 +1037,7 @@ body.modal-open {
     font-size: 11px;
   }
 
-  .post-modal {
-    padding: 0;
-  }
-
-  .post-modal-dialog {
-    border: none;
-    max-height: 100vh;
-    width: 100%;
-  }
-
-  .post-modal-body {
-    padding: 8px 10px 14px;
-  }
-
-  .post-modal-heading {
+  .post-heading {
     font-size: 16px;
   }
 

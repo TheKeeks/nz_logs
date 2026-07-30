@@ -14,6 +14,16 @@ function getToken() {
   return localStorage.getItem("gh_pat");
 }
 
+function authHeaders(extra) {
+  var headers = { Accept: "application/vnd.github.v3+json" };
+  var token = getToken();
+  if (token) headers.Authorization = "Bearer " + token;
+  if (extra) {
+    for (var k in extra) headers[k] = extra[k];
+  }
+  return headers;
+}
+
 function promptForToken() {
   if (getToken()) return;
   var token = prompt("First-time setup: paste your GitHub Personal Access Token.\nThis is saved locally and never leaves your browser.");
@@ -28,6 +38,26 @@ function clearToken() {
 (function () {
   var authenticated = false;
   var editingPostId = null;
+  var badTokenPrompted = false;
+
+  // GitHub returns 401 when the stored PAT has expired or been revoked
+  // (fine-grained tokens expire — this is the usual "admin stopped working" cause).
+  function handleBadToken() {
+    showStatus('GitHub token expired or invalid — click "Update GitHub Token" and paste a fresh one.', "error");
+    if (badTokenPrompted) return;
+    badTokenPrompted = true;
+    var msg = getToken()
+      ? "GitHub rejected your saved token — it has likely expired or been revoked.\n\nCreate a new fine-grained Personal Access Token (GitHub > Settings > Developer settings > Fine-grained tokens, Contents: Read and write on this repo) and paste it here:"
+      : "No GitHub token found.\n\nPaste your GitHub Personal Access Token:";
+    var token = prompt(msg);
+    if (token && token.trim()) {
+      localStorage.setItem("gh_pat", token.trim());
+      badTokenPrompted = false;
+      showStatus("Token updated — reloading posts...", "success");
+      loadCurrentMarquee();
+      loadPostsList();
+    }
+  }
 
   document.addEventListener("DOMContentLoaded", function () {
     checkPassword();
@@ -89,7 +119,15 @@ function clearToken() {
       .addEventListener("click", saveMarquee);
     document
       .getElementById("btn-update-token")
-      .addEventListener("click", clearToken);
+      .addEventListener("click", function () {
+        clearToken();
+        if (getToken()) {
+          badTokenPrompted = false;
+          showStatus("Token updated — reloading posts...", "success");
+          loadCurrentMarquee();
+          loadPostsList();
+        }
+      });
     document
       .getElementById("btn-insert-image")
       .addEventListener("click", function () {
@@ -233,8 +271,8 @@ function clearToken() {
         html += '</div></div>';
       });
       container.innerHTML = html;
-    }).catch(function () {
-      container.innerHTML = '<p style="color:#cc0000;">Failed to load posts.</p>';
+    }).catch(function (err) {
+      container.innerHTML = '<p style="color:#cc0000;">Failed to load posts: ' + escapeHtml(err.message) + '</p>';
     });
   }
 
@@ -362,11 +400,7 @@ function clearToken() {
           filename;
         fetch(url, {
           method: "PUT",
-          headers: {
-            Authorization: "Bearer " + getToken(),
-            Accept: "application/vnd.github.v3+json",
-            "Content-Type": "application/json",
-          },
+          headers: authHeaders({ "Content-Type": "application/json" }),
           body: JSON.stringify({
             message: "Add image: " + filename,
             content: base64,
@@ -374,6 +408,10 @@ function clearToken() {
           }),
         })
           .then(function (res) {
+            if (res.status === 401) {
+              handleBadToken();
+              throw new Error("GitHub token expired or invalid (401).");
+            }
             if (!res.ok) {
               return res.json().then(function (err) {
                 throw new Error(err.message || "Upload failed: " + res.status);
@@ -589,13 +627,12 @@ function clearToken() {
       "?ref=" +
       CONFIG.branch;
 
-    return fetch(url, {
-      headers: {
-        Authorization: "Bearer " + getToken(),
-        Accept: "application/vnd.github.v3+json",
-      },
-    })
+    return fetch(url, { headers: authHeaders() })
       .then(function (res) {
+        if (res.status === 401) {
+          handleBadToken();
+          throw new Error("GitHub token expired or invalid (401).");
+        }
         if (!res.ok) throw new Error("GitHub API GET failed: " + res.status);
         return res.json();
       })
@@ -617,11 +654,7 @@ function clearToken() {
 
     return fetch(url, {
       method: "PUT",
-      headers: {
-        Authorization: "Bearer " + getToken(),
-        Accept: "application/vnd.github.v3+json",
-        "Content-Type": "application/json",
-      },
+      headers: authHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify({
         message: message,
         content: content,
@@ -629,6 +662,10 @@ function clearToken() {
         branch: CONFIG.branch,
       }),
     }).then(function (res) {
+      if (res.status === 401) {
+        handleBadToken();
+        throw new Error("GitHub token expired or invalid (401).");
+      }
       if (!res.ok) {
         return res.json().then(function (err) {
           throw new Error(err.message || "GitHub API PUT failed");

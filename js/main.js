@@ -15,9 +15,8 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
   var publishedPosts = [];
 
   document.addEventListener("DOMContentLoaded", function () {
-    initLightbox();
     initTabs();
-    initPostModal();
+    initCardKeyboard();
     if (isSigned()) {
       loadPosts();
     } else {
@@ -199,7 +198,7 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     var loc = post.location ? escapeHtml(post.location) : "";
 
     return (
-      '<article class="post-card" data-post-id="' + escapeAttr(post.id) + '" tabindex="0" role="button" aria-label="Open post: ' + escapeAttr(post.title) + '">' +
+      '<article class="post-card" data-post-id="' + escapeAttr(post.id) + '" tabindex="0" role="button" aria-label="Open post in its own window: ' + escapeAttr(post.title) + '">' +
         '<div class="card-thumb">' +
           (thumb
             ? '<img loading="lazy" src="' + escapeAttr(thumb) + '" alt="">'
@@ -251,27 +250,25 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     if (!card) return;
     var id = card.getAttribute("data-post-id");
     var post = publishedPosts.find(function (p) { return p.id === id; });
-    if (post) openPostModal(post);
+    if (post) openPostWindow(post.id);
   }
 
-  // ── Post detail modal ─────────────────────────────────────────────────────────
+  // ── Post windows ──────────────────────────────────────────────────────────────
 
-  function initPostModal() {
-    var overlay = document.getElementById("post-modal");
-    if (!overlay) return;
-    overlay.addEventListener("click", function (e) {
-      if (e.target === overlay) closePostModal();
-      var closeBtn = e.target.closest(".post-modal-close");
-      if (closeBtn) closePostModal();
-      // Lightbox delegation for images inside the modal body
-      var img = e.target.closest(".post-image img");
-      if (img) openLightbox(img.src, img.getAttribute("alt") || "");
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && overlay.classList.contains("active")) {
-        closePostModal();
-      }
-    });
+  function openPostWindow(id) {
+    var url = "post.html?id=" + encodeURIComponent(id);
+    // Named per post so each story gets its own window; re-clicking refocuses it.
+    var name = "nzlog_post_" + id.replace(/[^a-zA-Z0-9_-]/g, "_");
+    var win = window.open(url, name, "width=800,height=920,resizable=yes,scrollbars=yes");
+    if (win) {
+      win.focus();
+    } else {
+      // Popup blocked — fall back to navigating in this window
+      window.location.href = url;
+    }
+  }
+
+  function initCardKeyboard() {
     // Open on Enter/Space when focused on a card
     document.addEventListener("keydown", function (e) {
       if (e.key !== "Enter" && e.key !== " ") return;
@@ -282,139 +279,8 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
       e.preventDefault();
       var id = card.getAttribute("data-post-id");
       var post = publishedPosts.find(function (p) { return p.id === id; });
-      if (post) openPostModal(post);
+      if (post) openPostWindow(post.id);
     });
-  }
-
-  function openPostModal(post) {
-    var overlay = document.getElementById("post-modal");
-    if (!overlay) return;
-
-    var dateStr = "";
-    if (post.date) {
-      var d = new Date(post.date + "T00:00:00");
-      dateStr = d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-    }
-
-    var titleText = post.title || "Post";
-
-    overlay.innerHTML =
-      '<div class="post-modal-dialog" role="document">' +
-        '<div class="post-modal-titlebar">' +
-          '<span class="post-modal-title">' + escapeHtml(titleText) + '</span>' +
-          '<button type="button" class="post-modal-close" aria-label="Close">' +
-            '<span aria-hidden="true">&#10005;</span>' +
-          '</button>' +
-        '</div>' +
-        '<div class="post-modal-body">' +
-          '<div class="post-modal-meta">' +
-            (dateStr
-              ? '<span class="post-date"><img src="https://unpkg.com/pixelarticons/svg/calendar.svg" class="pixel-icon pixel-icon-gray" alt=""> ' + escapeHtml(dateStr) + '</span>'
-              : '') +
-            (post.location
-              ? '<span class="post-location"><img src="https://unpkg.com/pixelarticons/svg/map-pin.svg" class="pixel-icon pixel-icon-green" alt=""> ' + escapeHtml(post.location) + '</span>'
-              : '') +
-          '</div>' +
-          '<h2 class="post-modal-heading">' + escapeHtml(titleText) + '</h2>' +
-          '<div class="post-body">' + (post.body || "") + '</div>' +
-        '</div>' +
-      '</div>';
-
-    overlay.classList.add("active");
-    overlay.setAttribute("aria-hidden", "false");
-    document.body.classList.add("modal-open");
-
-    var bodyEl = overlay.querySelector(".post-modal-body");
-    if (bodyEl) {
-      applyImageEnhancements(bodyEl, 2);
-      // Instagram embeds
-      if (bodyEl.innerHTML.indexOf("{{instagram:") !== -1 && window.Instagram) {
-        var inner = bodyEl.querySelector(".post-body");
-        if (inner) {
-          Instagram.resolveEmbeds(inner.innerHTML).then(function (resolved) {
-            inner.innerHTML = resolved;
-            Instagram.processEmbeds();
-          });
-        }
-      } else if (window.Instagram) {
-        Instagram.processEmbeds();
-      }
-    }
-
-    // Reset scroll to top of modal body each time it opens
-    if (bodyEl) bodyEl.scrollTop = 0;
-  }
-
-  function closePostModal() {
-    var overlay = document.getElementById("post-modal");
-    if (!overlay) return;
-    overlay.classList.remove("active");
-    overlay.setAttribute("aria-hidden", "true");
-    overlay.innerHTML = "";
-    document.body.classList.remove("modal-open");
-  }
-
-  // ── Image enhancements (loading/error states) ────────────────────────────────
-
-  function applyImageEnhancements(container, eagerCount) {
-    var imgs = container.querySelectorAll(".post-image img");
-    imgs.forEach(function (img, i) {
-      var figure = img.closest(".post-image");
-      if (!figure) return;
-      img.setAttribute("loading", i < eagerCount ? "eager" : "lazy");
-      if (!img.complete) {
-        figure.classList.add("img-loading");
-        img.addEventListener("load", function () {
-          figure.classList.remove("img-loading");
-        }, { once: true });
-        img.addEventListener("error", function () {
-          figure.classList.remove("img-loading");
-          figure.classList.add("img-error");
-        }, { once: true });
-      }
-    });
-  }
-
-  // ── Lightbox (reused) ─────────────────────────────────────────────────────────
-
-  function initLightbox() {
-    if (document.getElementById("lightbox-overlay")) return;
-    var overlay = document.createElement("div");
-    overlay.id = "lightbox-overlay";
-    overlay.innerHTML =
-      '<div id="lightbox-dialog">' +
-        '<div id="lightbox-titlebar">' +
-          '<span id="lightbox-title">Image</span>' +
-          '<button id="lightbox-close-btn">X</button>' +
-        "</div>" +
-        '<div id="lightbox-body"><img id="lightbox-img" src="" alt=""></div>' +
-        '<div id="lightbox-caption"></div>' +
-      "</div>";
-    document.body.appendChild(overlay);
-    document
-      .getElementById("lightbox-close-btn")
-      .addEventListener("click", closeLightbox);
-    overlay.addEventListener("click", function (e) {
-      if (e.target === overlay) closeLightbox();
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") closeLightbox();
-    });
-  }
-
-  function openLightbox(src, alt) {
-    document.getElementById("lightbox-img").src = src;
-    document.getElementById("lightbox-img").alt = alt;
-    document.getElementById("lightbox-title").textContent = alt || "Image";
-    document.getElementById("lightbox-caption").textContent = alt;
-    document.getElementById("lightbox-overlay").classList.add("active");
-  }
-
-  function closeLightbox() {
-    var overlay = document.getElementById("lightbox-overlay");
-    if (overlay) overlay.classList.remove("active");
-    var img = document.getElementById("lightbox-img");
-    if (img) img.src = "";
   }
 
   // ── Utilities ─────────────────────────────────────────────────────────────────
