@@ -384,7 +384,62 @@ function clearToken() {
       });
   }
 
-  function uploadImageToGitHub(file) {
+  // Recompress images in the browser before committing them: phone photos and
+  // screenshots arrive at 5-40MB, which bloats the repo and makes the site
+  // slow to load. Anything larger than ~1800px is downscaled and re-encoded
+  // as JPEG. Falls back to the original file if decoding fails (e.g. HEIC).
+  function compressImage(file) {
+    var MAX_DIM = 1800;
+    var QUALITY = 0.82;
+    var SKIP_BELOW = 300 * 1024;
+    if (file.size < SKIP_BELOW && file.type !== "image/png") {
+      return Promise.resolve(file);
+    }
+    return new Promise(function (resolve) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var w = img.naturalWidth;
+          var h = img.naturalHeight;
+          var scale = Math.min(1, MAX_DIM / Math.max(w, h));
+          var cw = Math.max(1, Math.round(w * scale));
+          var ch = Math.max(1, Math.round(h * scale));
+          var canvas = document.createElement("canvas");
+          canvas.width = cw;
+          canvas.height = ch;
+          var ctx = canvas.getContext("2d");
+          // White background so transparent PNGs don't turn black as JPEG
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, cw, ch);
+          ctx.drawImage(img, 0, 0, cw, ch);
+          URL.revokeObjectURL(url);
+          canvas.toBlob(function (blob) {
+            if (blob && blob.size < file.size) {
+              var base = (file.name && file.name !== "undefined" ? file.name : "image").replace(/\.[^.]+$/, "");
+              resolve(new File([blob], base + ".jpg", { type: "image/jpeg" }));
+            } else {
+              resolve(file);
+            }
+          }, "image/jpeg", QUALITY);
+        } catch (_) {
+          URL.revokeObjectURL(url);
+          resolve(file);
+        }
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      };
+      img.src = url;
+    });
+  }
+
+  function uploadImageToGitHub(originalFile) {
+    return compressImage(originalFile).then(uploadFileToGitHub);
+  }
+
+  function uploadFileToGitHub(file) {
     return new Promise(function (resolve, reject) {
       var reader = new FileReader();
       reader.onload = function (e) {
