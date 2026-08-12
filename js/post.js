@@ -132,12 +132,19 @@ var CONFIG = {
         '<div class="post-body">' + (post.body || "") + '</div>' +
       '</div>';
 
+    routeImagesThroughCdn(container);
     applyImageEnhancements(container, 2);
 
     // Click any post image to maximize it in the lightbox
     container.addEventListener("click", function (e) {
       var img = e.target.closest(".post-image img");
-      if (img) openLightbox(img.src, img.getAttribute("alt") || "");
+      if (img) {
+        openLightbox(
+          img.getAttribute("data-fit") || img.src,
+          img.getAttribute("alt") || "",
+          img.getAttribute("data-full") || img.src
+        );
+      }
     });
 
     // Instagram embeds
@@ -146,6 +153,7 @@ var CONFIG = {
       if (inner) {
         Instagram.resolveEmbeds(inner.innerHTML).then(function (resolved) {
           inner.innerHTML = resolved;
+          routeImagesThroughCdn(container);
           applyImageEnhancements(container, 2);
           Instagram.processEmbeds();
         });
@@ -153,6 +161,33 @@ var CONFIG = {
     } else if (window.Instagram) {
       Instagram.processEmbeds();
     }
+  }
+
+  // ── CDN routing ──────────────────────────────────────────────────────────────
+
+  // Swap repo-hosted originals (often several MB each) for ~1000px WebP CDN
+  // copies. The original URL is kept in data-full for the lightbox's
+  // "Full Size" view, and as the fallback if the CDN fails.
+  function routeImagesThroughCdn(container) {
+    var imgs = container.querySelectorAll(".post-image img");
+    imgs.forEach(function (img) {
+      var src = img.getAttribute("src");
+      var small = NZImg.cdn(src, 1000);
+      if (small === src || img.getAttribute("data-full")) return;
+      var full;
+      try { full = new URL(src, window.location.href).href; } catch (_) { return; }
+      img.setAttribute("data-full", full);
+      img.setAttribute("data-fit", NZImg.cdn(src, 1600));
+      img.addEventListener("error", function () {
+        var figure = img.closest(".post-image");
+        img.addEventListener("load", function () {
+          if (figure) figure.classList.remove("img-error");
+        }, { once: true });
+        img.removeAttribute("data-fit");
+        img.src = full;
+      }, { once: true });
+      img.src = small;
+    });
   }
 
   // ── Image enhancements (loading/error states) ────────────────────────────────
@@ -213,9 +248,11 @@ var CONFIG = {
     });
   }
 
-  function openLightbox(src, alt) {
-    document.getElementById("lightbox-img").src = src;
-    document.getElementById("lightbox-img").alt = alt;
+  function openLightbox(src, alt, fullSrc) {
+    var img = document.getElementById("lightbox-img");
+    img.src = src;
+    img.alt = alt;
+    img.setAttribute("data-full", fullSrc || src);
     document.getElementById("lightbox-title").textContent = alt || "Image";
     document.getElementById("lightbox-caption").textContent = alt;
     setLightboxZoom(false);
@@ -231,6 +268,10 @@ var CONFIG = {
     var body = document.getElementById("lightbox-body");
     var btn = document.getElementById("lightbox-zoom-btn");
     body.classList.toggle("zoomed", zoomed);
+    // Full-resolution original is only fetched on demand
+    var img = document.getElementById("lightbox-img");
+    var full = img && img.getAttribute("data-full");
+    if (zoomed && full && img.src !== full) img.src = full;
     if (btn) btn.textContent = zoomed ? "Fit" : "Full Size";
   }
 

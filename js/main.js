@@ -197,11 +197,23 @@ var GUESTBOOK_EXCLUDED = ["keeks", "elsie"];
     var teaser = makeTeaser(post.body, 160);
     var loc = post.location ? escapeHtml(post.location) : "";
 
+    // Cards render at 110px square — request a small CDN copy instead of the
+    // multi-MB original, falling back to the original if the CDN is down.
+    var thumbSmall = thumb ? NZImg.cdn(thumb, 240) : "";
+    var thumbImg = "";
+    if (thumb) {
+      thumbImg = '<img loading="lazy" decoding="async" src="' + escapeAttr(thumbSmall) + '"';
+      if (thumbSmall !== thumb) {
+        thumbImg += ' data-full="' + escapeAttr(thumb) + '" onerror="this.onerror=null;this.src=this.getAttribute(\'data-full\');"';
+      }
+      thumbImg += ' alt="">';
+    }
+
     return (
       '<article class="post-card" data-post-id="' + escapeAttr(post.id) + '" tabindex="0" role="button" aria-label="Open post: ' + escapeAttr(post.title) + '">' +
         '<div class="card-thumb">' +
           (thumb
-            ? '<img loading="lazy" src="' + escapeAttr(thumb) + '" alt="">'
+            ? thumbImg
             : '<div class="card-thumb-empty"></div>') +
           (badge
             ? '<span class="card-date-badge"><span class="dm">' + badge.month + '</span><span class="dd">' + badge.day + '</span></span>'
